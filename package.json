@@ -1,0 +1,38 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Medical Appointment And Patient Management System",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js",
+    "generate": "drizzle-kit generate",
+    "migrate": "tsx src/drizzle/migrate.ts",
+    "push": "drizzle-kit push"
+  },
+  "keywords": [],
+  "author": "Susan",
+  "license": "ISC",
+  "packageManager": "pnpm@10.11.0",
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17",
+    "@types/pg": "^8.15.4",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.0.0",
+    "drizzle-orm": "^0.44.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.4",
+    "pg": "^8.16.3"
+  }
+}
