@@ -29,7 +29,7 @@ export const createCheckoutSessionService = async (appointmentId: number) => {
             name: "Hospital Appointment",
             images: ["http://localhost:8081/images/CareConnect.jpg"]
           },
-          unit_amount: Math.round(amount), // This is in cents
+          unit_amount: Math.round(amount * 100),
         },
         quantity: 1,
       },

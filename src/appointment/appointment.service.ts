@@ -49,7 +49,7 @@ export const createAppointmentService = async (appointment: TIAppointment) => {
   }
 
   // Add default consultation fee & insert
-  const consultationFee = "1000.00";
+  const consultationFee = "6500.00";
 
   const appointmentWithFee = {
     ...appointment,
