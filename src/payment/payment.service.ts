@@ -1,13 +1,24 @@
 import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import db from "../drizzle/db";
-import { PaymentsTable, TIPayment } from "../drizzle/schema";
+import { PaymentsTable, TIPayment, AppointmentsTable } from "../drizzle/schema";
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 // Create a Stripe Checkout Session
-export const createCheckoutSessionService = async (appointmentId: number, amount: number) => {
+export const createCheckoutSessionService = async (appointmentId: number) => {
+  // Fetch the correct appointment
+  const appointment = await db.query.AppointmentsTable.findFirst({
+    where: eq(AppointmentsTable.appointmentId, appointmentId),
+  });
+
+  if (!appointment) throw new Error("Appointment not found");
+
+  const amount =  Number(appointment.totalAmount);
+  if (!amount || amount <= 0) throw new Error("Invalid appointment amount");
+
+  // Create session with correct amount
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: [
@@ -18,7 +29,7 @@ export const createCheckoutSessionService = async (appointmentId: number, amount
             name: "Hospital Appointment",
             images: ["http://localhost:8081/images/CareConnect.jpg"]
           },
-          unit_amount: Math.round(amount),
+          unit_amount: Math.round(amount), // This is in cents
         },
         quantity: 1,
       },
@@ -33,6 +44,7 @@ export const createCheckoutSessionService = async (appointmentId: number, amount
 
   return session.url;
 };
+
 
 // Save payment record (after successful webhook or frontend confirmation)
 export const createPaymentRecordService = async (payment: TIPayment) => {

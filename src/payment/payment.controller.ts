@@ -8,6 +8,7 @@ import {
   getPaymentsByAppointmentService,
   updatePaymentStatusService
 } from "./payment.service";
+import { getAppointmentByIdService } from "../appointment/appointment.service";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -25,12 +26,31 @@ export const stripeWebhookController = async (req: Request, res: Response) => {
       const session = event.data.object as Stripe.Checkout.Session;
 
       const appointmentId = parseInt(session.metadata?.appointmentId || "0");
-      const amount = (session.amount_total || 0) / 100;
+      const amountPaid = (session.amount_total || 0) / 100; // KES is 0-decimal currency
       const transactionId = session.payment_intent as string;
 
+      // Fetch the appointment to verify expected amount
+      const appointment = await getAppointmentByIdService(appointmentId);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+
+      const expectedAmount = Number(appointment.totalAmount);
+      if (isNaN(expectedAmount) || expectedAmount <= 0) {
+        return res.status(400).json({ message: "Invalid expected amount for appointment" });
+      }
+
+      // Verify amount paid matches the expected appointment amount
+      if (amountPaid !== expectedAmount) {
+        return res.status(400).json({
+          message: `Payment amount mismatch. Expected ${expectedAmount}, received ${amountPaid}`,
+        });
+      }
+
+      // Save the payment
       await createPaymentRecordService({
         appointmentId,
-        amount: amount.toFixed(2),
+        amount: amountPaid.toFixed(2),
         paymentStatus: "Paid",
         transactionId,
         paymentDate: new Date(),
@@ -46,21 +66,23 @@ export const stripeWebhookController = async (req: Request, res: Response) => {
   }
 };
 
+
 // Create Stripe Checkout Session
 export const createCheckoutSessionController = async (req: Request, res: Response) => {
   try {
-    const { appointmentId, amount } = req.body;
+    const { appointmentId } = req.body;
 
-    if (!appointmentId || !amount) {
-      return res.status(400).json({ message: "Appointment ID and amount are required" });
+    if (!appointmentId) {
+      return res.status(400).json({ message: "appointmentId is required" });
     }
 
-    const url = await createCheckoutSessionService(appointmentId, amount);
+    const url = await createCheckoutSessionService(appointmentId);
     return res.status(200).json({ url });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
 };
+
 
 // Get All Payments
 export const getAllPaymentsController = async (_req: Request, res: Response) => {
