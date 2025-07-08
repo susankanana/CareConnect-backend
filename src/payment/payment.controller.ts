@@ -26,8 +26,11 @@ export const stripeWebhookController = async (req: Request, res: Response) => {
       const session = event.data.object as Stripe.Checkout.Session;
 
       const appointmentId = parseInt(session.metadata?.appointmentId || "0");
+      console.log(`Here is the appointment ID --->>>${appointmentId}`)
       const amountPaid = (session.amount_total || 0) / 100; // KES is 0-decimal currency
+      console.log(`Here is the amount_total --->>>${session.amount_total }`)
       const transactionId = session.payment_intent as string;
+      console.log(`Here is the payment_intent --->>>${session.payment_intent}`)
 
       // Fetch the appointment to verify expected amount
       const appointment = await getAppointmentByIdService(appointmentId);
