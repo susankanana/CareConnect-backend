@@ -4,7 +4,7 @@ const config: Config = {
     preset: 'ts-jest', //means that we are using TypeScript with Jest
     testEnvironment: 'node', //the environment in which the tests will run
     verbose: true, //show individual test results with the test suite hierarchy
-    //testTimeout : 30000,
+    testTimeout : 30000,
     // collectCoverage: true, //collect coverage information
     // coverageDirectory: 'coverage', //directory where Jest should output its coverage files
     // collectCoverageFrom: [

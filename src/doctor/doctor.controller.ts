@@ -37,7 +37,7 @@ export const getDoctorsController = async (req: Request, res: Response) => {
 //get doctor by specialization
 export const getDoctorBySpecializationController = async (req: Request, res: Response) => {
   try {
-    const specialization = req.params.specialization;
+    const specialization = req.params.specialization?.trim();
 
     if (!specialization || specialization.trim() === "") {
       return res.status(400).json({ message: "Specialization is required" });
