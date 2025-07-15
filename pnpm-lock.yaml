@@ -44,6 +44,9 @@ importers:
       pg:
         specifier: ^8.16.3
         version: 8.16.3
+      rate-limiter-flexible:
+        specifier: ^7.1.1
+        version: 7.1.1
       stripe:
         specifier: ^18.3.0
         version: 18.3.0(@types/node@24.0.8)
@@ -54,6 +57,9 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
+      '@types/k6':
+        specifier: ^1.1.1
+        version: 1.1.1
       '@types/nodemailer':
         specifier: ^6.4.17
         version: 6.4.17
@@ -768,6 +774,9 @@ packages:
 
   '@types/jsonwebtoken@9.0.10':
     resolution: {integrity: sha512-asx5hIG9Qmf/1oStypjanR7iKTv0gXQ1Ov/jfrX6kS/EO0OFni8orbmGCn0672NHR3kXHwpAwR+B368ZGN/2rA==}
+
+  '@types/k6@1.1.1':
+    resolution: {integrity: sha512-ioNtKGb59VEBfmM8iJIRp1OpE4y8sfEBHBy55VXYzoicIQAWWVae+RYDstCoVAIqyFA1bfaLwAWKKEUxp0SwnA==}
 
   '@types/methods@1.1.4':
     resolution: {integrity: sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==}
@@ -2043,6 +2052,9 @@ packages:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
 
+  rate-limiter-flexible@7.1.1:
+    resolution: {integrity: sha512-lsYRcqRSJrKBNt6pMzBJTiCJP5KnwsGWdObMZxd19JFUJRntM+yuHs4/2bs6NZweSLgpsDcykvzyQaumoslWQg==}
+
   raw-body@3.0.0:
     resolution: {integrity: sha512-RmkhL8CAyCRPXCE28MMH0z2PNWQBNk2Q09ZdxM9IOOXwxwZbN+qbWaatPkdkWIKL2ZVDImrN/pK5HTRz2PcS4g==}
     engines: {node: '>= 0.8'}
@@ -3091,6 +3103,8 @@ snapshots:
     dependencies:
       '@types/ms': 2.1.0
       '@types/node': 24.0.8
+
+  '@types/k6@1.1.1': {}
 
   '@types/methods@1.1.4': {}
 
@@ -4452,6 +4466,8 @@ snapshots:
       side-channel: 1.1.0
 
   range-parser@1.2.1: {}
+
+  rate-limiter-flexible@7.1.1: {}
 
   raw-body@3.0.0:
     dependencies:

@@ -10,7 +10,26 @@
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/drizzle/migrate.ts",
     "push": "drizzle-kit push",
-    "test": "jest"
+    "test": "jest",
+    "smoke:login": "k6 run load-tests/smoke/login.smoke.ts",
+    "smoke:register": "k6 run load-tests/smoke/register.smoke.ts",
+    "smoke:getdoctors": "k6 run load-tests/smoke/doctors.get.smoke.ts",
+    "smoke:createappointment": "k6 run load-tests/smoke/appointment.post.smoke.ts",
+    "load:register": "k6 run load-tests/load/register.load.ts",
+    "load:getdoctors": "k6 run load-tests/load/doctors.get.load.ts",
+    "load:createappointment": "k6 run load-tests/load/appointment.post.load.ts",
+    "stress:register": "k6 run load-tests/stress/register.stress.ts",
+    "stress:getdoctors": "k6 run load-tests/stress/doctors.get.stress.ts",
+    "stress:createappointment": "k6 run load-tests/stress/appointment.post.stress.ts",
+    "spike:register": "k6 run load-tests/spike/register.spike.ts",
+    "spike:getdoctors": "k6 run load-tests/spike/doctors.get.spike.ts",
+    "spike:createappointment": "k6 run load-tests/spike/appointment.post.spike.ts",
+    "soak:register": "k6 run load-tests/soak/register.soak.ts",
+    "soak:getdoctors": "k6 run load-tests/soak/doctors.get.soak.ts",
+    "soak:createappointment": "k6 run load-tests/soak/appointment.post.soak.ts",
+    "breakpoint:register": "k6 run load-tests/breakpoint/register.breakpoint.ts",
+    "breakpoint:getdoctors": "k6 run load-tests/breakpoint/doctors.get.breakpoint.ts",
+    "breakpoint:createappointment": "k6 run load-tests/breakpoint/appointment.post.breakpoint.ts"
   },
   "keywords": [],
   "author": "Susan",
@@ -19,6 +38,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/jest": "^30.0.0",
+    "@types/k6": "^1.1.1",
     "@types/nodemailer": "^6.4.17",
     "@types/pg": "^8.15.4",
     "@types/supertest": "^6.0.3",
@@ -43,6 +63,7 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.4",
     "pg": "^8.16.3",
+    "rate-limiter-flexible": "^7.1.1",
     "stripe": "^18.3.0"
   }
 }
