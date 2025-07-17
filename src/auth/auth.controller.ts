@@ -25,34 +25,23 @@ export const registerUserController = async (req: Request, res: Response) => {
         try {
             await sendEmail(
                 user.email,
-                "CareConnect Account Verification",
-                `Hello ${user.firstName} ${user.lastName}, please verify your account with the code below.`, 
-                `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-                <h2 style="color: #2c3e50;">🏥 Welcome to CareConnect</h2>
-                <p style="font-size: 16px; color: #333;">
-                    Dear <strong>${user.firstName} ${user.lastName}</strong>,
-                </p>
-                <p style="font-size: 16px; color: #333;">
-                    Thank you for registering with <strong>CareConnect</strong>, a medical appointment and patient management system.
-                </p>
-                <p style="font-size: 16px; color: #333;">
-                    Your verification code is:
-                </p>
-                <div style="font-size: 24px; font-weight: bold; color: #007bff; background-color: #f0f8ff; padding: 10px 20px; display: inline-block; border-radius: 6px;">
-                    ${verificationCode}
-                </div>
-                <p style="margin-top: 20px; font-size: 14px; color: #555;">
-                    Please enter this code in the app to verify your account.
-                </p>
-                <hr style="margin: 30px 0;">
-                <p style="font-size: 12px; color: #aaa;">
-                    If you did not request this, please ignore this email or contact our support.
-                </p>
-                <p style="font-size: 12px; color: #aaa;">
-                    &copy; 2025 HopeCare Hospital. All rights reserved.
-                </p>
-                </div>`
-            );
+                    "CareConnect Account Verification",
+                    `Hello ${user.firstName} ${user.lastName}, please verify your account with the code below.`,
+                    `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; background: linear-gradient(to bottom right, #f0fdfa, #fff0f6); border-radius: 12px; border: 1px solid #e2e8f0;">
+                        <h2 style="color: #0f766e;">🏥 Welcome to CareConnect</h2>
+                        <p style="font-size: 16px; color: #333;">Dear <strong>${user.firstName} ${user.lastName}</strong>,</p>
+                        <p style="font-size: 16px; color: #333;">Thank you for registering with <strong>CareConnect</strong>, a medical appointment and patient management system.</p>
+                        <p style="font-size: 16px; color: #333;">Your verification code is:</p>
+                        <div style="font-size: 24px; font-weight: bold; color: #0ea5e9; background-color: #ecfeff; padding: 10px 20px; display: inline-block; border-radius: 6px;">
+                            ${verificationCode}
+                        </div>
+                        <p style="margin-top: 20px; font-size: 14px; color: #555;">Please enter this code in the app to verify your account.</p>
+                        <hr style="margin: 30px 0;">
+                        <p style="font-size: 12px; color: #888;">If you did not request this, please ignore this email or contact our support.</p>
+                        <p style="font-size: 12px; color: #888;">&copy; 2025 CareConnect. All rights reserved.</p>
+                    </div>`
+                );
+
         } catch (emailError) {
             console.error("Failed to send registration email:", emailError);
         }
@@ -77,34 +66,34 @@ export const verifyUserController = async (req: Request, res: Response) => {
             // Send verification success email
             try {
                 await sendEmail(
-    user.email,
-        "CareConnect Account Verified Successfully",
-        `Hello ${user.firstName} ${user.lastName}, your CareConnect account has been successfully verified! You can now log in and access all features.`, // Updated plain text message
-        `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #ffffff;">
-            <h2 style="color: #2c3e50; text-align: center; margin-bottom: 20px;">🎉 Account Verified Successfully!</h2>
-            <p style="font-size: 16px; color: #333;">
-                Dear <strong>${user.firstName} ${user.lastName}</strong>,
-            </p>
-            <p style="font-size: 16px; color: #333;">
-                We are thrilled to inform you that your **CareConnect** account has been <strong>successfully verified</strong>!
-            </p>
-            <p style="font-size: 16px; color: #333;">
-                You can now log in to the system and start managing your medical appointments and patient records with ease.
-            </p>
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="YOUR_LOGIN_PAGE_URL_HERE" style="background-color: #007bff; color: #ffffff; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 16px;">
-                    Log In to CareConnect
-                </a>
-            </div>
-            <p style="font-size: 14px; color: #555; text-align: center;">
-                If you have any questions or need assistance, please do not hesitate to contact our support team.
-            </p>
-            <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
-            <p style="font-size: 12px; color: #aaa; text-align: center;">
-                &copy; 2025 CareConnect. All rights reserved.
-            </p>
-        </div>`
-);
+                    user.email,
+                    "CareConnect Account Verified Successfully",
+                    `Hello ${user.firstName} ${user.lastName}, your CareConnect account has been successfully verified! You can now log in and access all features.`,
+                    `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                        <h2 style="color: #0f172a; text-align: center; margin-bottom: 20px;">🎉 Account Verified Successfully!</h2>
+                        <p style="font-size: 16px; color: #333;">Dear <strong>${user.firstName} ${user.lastName}</strong>,</p>
+                        <p style="font-size: 16px; color: #333;">
+                            We are thrilled to inform you that your <strong>CareConnect</strong> account has been <strong>successfully verified</strong>!
+                        </p>
+                        <p style="font-size: 16px; color: #333;">
+                            You can now log in and start managing your appointments with ease.
+                        </p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="http://localhost:5173/login"
+                                style="background: linear-gradient(to right, #14b8a6, #ec4899); color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+                                Log In to CareConnect
+                            </a>
+                        </div>
+                        <p style="font-size: 14px; color: #555; text-align: center;">
+                            If you have any questions or need assistance, contact our support team.
+                        </p>
+                        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+                        <p style="font-size: 12px; color: #888; text-align: center;">
+                            &copy; 2025 CareConnect. All rights reserved.
+                        </p>
+                    </div>`
+                );
+
             } catch (error: any) {
                 console.error("Failed to send verification success email:", error);
 

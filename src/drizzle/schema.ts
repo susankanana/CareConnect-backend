@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgEnum, boolean, integer, pgTable, serial, text, timestamp, varchar, date, time, numeric } from "drizzle-orm/pg-core";
+import { pgEnum, boolean, integer, pgTable, serial, text, timestamp, varchar, date, time, numeric, real } from "drizzle-orm/pg-core";
 
 // Enums
 export const RoleEnum = pgEnum("role", ["user", "admin", "doctor"]);
@@ -28,6 +28,9 @@ export const DoctorsTable = pgTable("doctors", {
   doctorId: integer("doctor_id").primaryKey().references(() => UsersTable.userId, { onDelete: "cascade" }),
   specialization: varchar("specialization", { length: 100 }).notNull(),
   availableDays: text("available_days").array(),
+  rating: real("rating").default(4.5),
+  experience: integer("experience"),
+  patients: integer("patients"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
@@ -156,6 +159,9 @@ export const ComplaintRelations = relations(ComplaintsTable, ({ one }) => ({
 export type TIUser = typeof UsersTable.$inferInsert & {
   specialization?: string;
   availableDays?: string[];
+  experience?: number;
+  patients?: number;
+  rating?: number;
 };
 
 export type TSUser = typeof UsersTable.$inferSelect;

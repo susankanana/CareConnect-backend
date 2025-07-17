@@ -6,15 +6,17 @@ import { TIUser, UsersTable, TSUser, TSUserLoginInput, DoctorsTable } from "../d
 // register a user
 export const createUserService = async (user: TIUser) => {
   const {
-  specialization,
-  availableDays,
-  ...userData
-} = user;
+    specialization,
+    availableDays,
+    experience,
+    patients,
+    rating,
+    ...userData
+  } = user;
 
-  // Step 1: Create the user
+  // Step 1: Create user
   const [created] = await db.insert(UsersTable).values(userData).returning();
   const userId = created.userId;
-
 
   // Step 2: If doctor, insert into DoctorsTable
   if (created.role === "doctor") {
@@ -25,12 +27,16 @@ export const createUserService = async (user: TIUser) => {
     await db.insert(DoctorsTable).values({
       doctorId: userId,
       specialization,
-      availableDays: availableDays as string[]
+      availableDays: availableDays as string[],
+      experience: experience ?? 0,
+      patients: patients ?? 0,
+      rating: rating ?? 4.5,
     });
   }
 
   return created;
 };
+
 
 
 // verify a user
@@ -83,10 +89,12 @@ export const updateUserService = async (id: number, user: TIUser) => {
   const {
     specialization,
     availableDays,
+    experience,
+    patients,
+    rating,
     ...userData
   } = user;
 
-  // Step 1: Get the current user before update
   const [existingUser] = await db
     .select()
     .from(UsersTable)
@@ -96,14 +104,12 @@ export const updateUserService = async (id: number, user: TIUser) => {
     throw new Error("User not found.");
   }
 
-  // Step 2: Update the user in UsersTable
   const [updatedUser] = await db
     .update(UsersTable)
     .set(userData)
     .where(eq(UsersTable.userId, id))
     .returning();
 
-  // Step 3: Doctor logic
   const isNowDoctor = updatedUser.role === "doctor";
   const wasDoctor = existingUser.role === "doctor";
 
@@ -113,37 +119,44 @@ export const updateUserService = async (id: number, user: TIUser) => {
       .from(DoctorsTable)
       .where(eq(DoctorsTable.doctorId, id));
 
+    const doctorData = {
+      ...(specialization && { specialization }),
+      ...(availableDays && { availableDays: availableDays as string[] }),
+      ...(experience !== undefined && { experience }),
+      ...(patients !== undefined && { patients }),
+      ...(rating !== undefined && { rating }),
+    };
+
     if (doctorRecord) {
-      // Update doctor record if values are provided
-      if (specialization || availableDays) {
+      if (Object.keys(doctorData).length > 0) {
         await db
           .update(DoctorsTable)
-          .set({
-            ...(specialization && { specialization }),
-            ...(availableDays && { availableDays: availableDays as string[] }),
-          })
+          .set(doctorData)
           .where(eq(DoctorsTable.doctorId, id));
       }
     } else {
-      // Insert new doctor record if it doesn't exist
       if (!specialization || !availableDays) {
         throw new Error("Doctor record missing specialization or availableDays.");
       }
+
       await db.insert(DoctorsTable).values({
         doctorId: id,
         specialization,
         availableDays: availableDays as string[],
+        experience: experience ?? 0,
+        patients: patients ?? 0,
+        rating: rating ?? 4.5,
       });
     }
   }
 
-  // Step 4: If role was doctor and is no longer doctor, delete doctor record
   if (wasDoctor && !isNowDoctor) {
     await db.delete(DoctorsTable).where(eq(DoctorsTable.doctorId, id));
   }
 
   return "User updated successfully";
 };
+
 
 // delete user by id
 export const deleteUserService = async (id: number) => {

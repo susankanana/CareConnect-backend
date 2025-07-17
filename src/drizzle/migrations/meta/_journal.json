@@ -15,6 +15,13 @@
       "when": 1751540919904,
       "tag": "0001_burly_lady_ursula",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752754976138,
+      "tag": "0002_gray_nick_fury",
+      "breakpoints": true
     }
   ]
 }
