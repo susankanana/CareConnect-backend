@@ -8,9 +8,9 @@ import {
 } from "../middleware/bearerAuth";
 
 const doctor = (app: Express) => {
-  // Get all doctors (admin or doctor roles allowed)
+  // Get all doctors (all roles: admin, doctor, user allowed)
   app.route("/doctors").get(
-    bothRoleAuth,
+    allRoleAuth,
     async (req, res, next) => {
       try {
         await getDoctorsController(req, res);
