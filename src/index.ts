@@ -30,7 +30,7 @@ const initializeApp = () => {
   app.use(express.json()); // Used to parse JSON bodies
   app.use(cors({
     origin: "http://localhost:5173", // adjust this if deployed
-    methods: ["GET", "POST", "PUT", "DELETE"]
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
   }));
   app.use("/images", express.static("images"));
 
