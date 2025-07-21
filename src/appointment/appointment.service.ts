@@ -86,8 +86,11 @@ export const getAppointmentsByUserIdService = async (userId: number) => {
       status: AppointmentsTable.appointmentStatus,
       totalAmount: AppointmentsTable.totalAmount,
       patient: {
+        id: UsersTable.userId,
         name: UsersTable.firstName,
-        lastName: UsersTable.lastName
+        lastName: UsersTable.lastName,
+        email: UsersTable.email,
+        contactPhone: UsersTable.contactPhone
       },
       doctor: {
         id: DoctorsTable.doctorId,
@@ -123,6 +126,7 @@ export const getAppointmentsByStatusService = async (status: string) => {
 
 //Get detailed appointment with doctor and patient details
 export const getDetailedAppointmentsService = async () => {
+  const doctorUser = alias(UsersTable, "doctorUser"); 
   const result = await db
     .select({
       appointmentId: AppointmentsTable.appointmentId,
@@ -134,16 +138,20 @@ export const getDetailedAppointmentsService = async () => {
         id: UsersTable.userId,
         name: UsersTable.firstName,
         lastName: UsersTable.lastName,
-        email: UsersTable.email
+        email: UsersTable.email,
+        contactPhone: UsersTable.contactPhone
       },
       doctor: {
         id: DoctorsTable.doctorId,
+        name: doctorUser.firstName,
+        lastName: doctorUser.lastName,
         specialization: DoctorsTable.specialization
       }
     })
     .from(AppointmentsTable)
     .leftJoin(UsersTable, eq(AppointmentsTable.userId, UsersTable.userId))
-    .leftJoin(DoctorsTable, eq(AppointmentsTable.doctorId, DoctorsTable.doctorId));
+    .leftJoin(DoctorsTable, eq(AppointmentsTable.doctorId, DoctorsTable.doctorId))
+    .leftJoin(doctorUser, eq(DoctorsTable.doctorId, doctorUser.userId));
 
   return result;
 };
