@@ -108,13 +108,40 @@ export const getAppointmentsByUserIdService = async (userId: number) => {
   return result;
 };
 
-// Get appointments by Doctor ID
+// Get detailed appointments by Doctor ID
 export const getAppointmentsByDoctorIdService = async (doctorId: number) => {
-  const appointments = await db.query.AppointmentsTable.findMany({
-    where: eq(AppointmentsTable.doctorId, doctorId),
-  });
-  return appointments;
+  const doctorUser = alias(UsersTable, "doctorUser");
+
+  const result = await db
+    .select({
+      appointmentId: AppointmentsTable.appointmentId,
+      appointmentDate: AppointmentsTable.appointmentDate,
+      timeSlot: AppointmentsTable.timeSlot,
+      status: AppointmentsTable.appointmentStatus,
+      totalAmount: AppointmentsTable.totalAmount,
+      patient: {
+        id: UsersTable.userId,
+        name: UsersTable.firstName,
+        lastName: UsersTable.lastName,
+        email: UsersTable.email,
+        contactPhone: UsersTable.contactPhone
+      },
+      doctor: {
+        id: DoctorsTable.doctorId,
+        name: doctorUser.firstName,
+        lastName: doctorUser.lastName,
+        specialization: DoctorsTable.specialization
+      }
+    })
+    .from(AppointmentsTable)
+    .leftJoin(UsersTable, eq(AppointmentsTable.userId, UsersTable.userId))
+    .leftJoin(DoctorsTable, eq(AppointmentsTable.doctorId, DoctorsTable.doctorId))
+    .leftJoin(doctorUser, eq(DoctorsTable.doctorId, doctorUser.userId))
+    .where(eq(AppointmentsTable.doctorId, doctorId));
+
+  return result;
 };
+
 
 //Get appointments by status
 export const getAppointmentsByStatusService = async (status: string) => {
