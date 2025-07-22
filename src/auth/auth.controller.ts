@@ -237,8 +237,8 @@ export const updateUserController = async (req: Request, res: Response) => {
     return res.status(500).json({ error: error.message });
   }
 };
-// delete user by id controller
 
+// delete user by id controller
 export const deleteUserController = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.id);
