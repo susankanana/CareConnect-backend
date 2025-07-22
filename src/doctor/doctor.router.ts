@@ -8,9 +8,8 @@ import {
 } from "../middleware/bearerAuth";
 
 const doctor = (app: Express) => {
-  // Get all doctors (all roles: admin, doctor, user allowed)
+  // No authentication so that doctors can be automatically fetched without need for login
   app.route("/doctors").get(
-    allRoleAuth,
     async (req, res, next) => {
       try {
         await getDoctorsController(req, res);
