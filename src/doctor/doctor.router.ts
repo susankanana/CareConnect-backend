@@ -8,7 +8,7 @@ import {
 } from "../middleware/bearerAuth";
 
 const doctor = (app: Express) => {
-  // No authentication so that doctors can be automatically fetched without need for login
+  // No authorization so that doctors can be automatically fetched without need for login
   app.route("/doctors").get(
     async (req, res, next) => {
       try {
