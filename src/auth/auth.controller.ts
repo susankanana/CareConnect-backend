@@ -207,30 +207,36 @@ export const getUserByIdController = async (req: Request, res: Response) => {
 
 // update user by id controller
 export const updateUserController = async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        if (isNaN(id)) {
-            return res.status(400).json({ message: "Invalid ID" });
-        }
-
-        const user = req.body;
-
-        const existingUser = await getUserByIdService(id);
-        if (!existingUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        const updatedUser = await updateUserService(id, user);
-        if (!updatedUser) {
-            return res.status(400).json({ message: "User not updated" });
-        }
-        return res.status(200).json({ message: "User updated successfully" });
-
-    } catch (error: any) {
-        return res.status(500).json({ error: error.message });
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
     }
-}
 
+    const user = req.body;
+
+    //Hash the password if it's being updated
+    if (user.password) {
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      user.password = hashedPassword;
+    }
+
+    const existingUser = await getUserByIdService(id);
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const updatedUser = await updateUserService(id, user);
+    if (!updatedUser) {
+      return res.status(400).json({ message: "User not updated" });
+    }
+
+    return res.status(200).json({ message: "User updated successfully" });
+
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 // delete user by id controller
 
 export const deleteUserController = async (req: Request, res: Response) => {
