@@ -88,9 +88,9 @@ const prescription = (app: Express) => {
     }
   );
 
-  // Delete prescription (admin only)
+  // Delete prescription (admin and doctor)
   app.route("/prescription/:id").delete(
-    adminRoleAuth,
+    bothRoleAuth,
     async (req, res, next) => {
       try {
         await deletePrescriptionController(req, res);
