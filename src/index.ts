@@ -29,7 +29,10 @@ const initializeApp = () => {
   // General middlewares
   app.use(express.json()); // Used to parse JSON bodies
   app.use(cors({
-    origin: "http://localhost:5173", // adjust this if deployed
+   origin: [
+    "http://localhost:5173", // for local dev
+    "https://care-connect-frontend.vercel.app" // for deployed frontend
+  ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
   }));
   app.use("/images", express.static("images"));
