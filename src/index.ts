@@ -31,7 +31,8 @@ const initializeApp = () => {
   app.use(cors({
    origin: [
     "http://localhost:5173", // for local dev
-    "https://care-connect-frontend.vercel.app" // for deployed frontend
+    "https://care-connect-frontend.vercel.app", // main production domain
+    "https://care-connect-frontend-git-master-susan-kananas-projects.vercel.app" // Vercel preview link
   ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
   }));
