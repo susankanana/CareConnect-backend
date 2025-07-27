@@ -9,6 +9,7 @@ import prescription from './prescription/prescription.router';
 import complaint from './complaint/complaint.router';
 import payment from './payment/payment.router';
 import { stripeWebhookController } from './payment/payment.controller';
+import service from './service/service.router';
 
 const initializeApp = () => {
   const app = express();
@@ -45,6 +46,7 @@ const initializeApp = () => {
   prescription(app);
   complaint(app);
   payment(app);
+  service(app);
 
   app.get('/', (_req, res) => {
     res.send('Hello, World!');
