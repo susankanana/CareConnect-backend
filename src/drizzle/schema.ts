@@ -35,6 +35,21 @@ export const DoctorsTable = pgTable("doctors", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
+//Services Table
+export const ServicesTable = pgTable('services', {
+  serviceId: serial('service_id').primaryKey(),
+  title: varchar('title', { length: 100 }).notNull().unique(),
+  description: text('description').notNull(),
+  icon: varchar('icon', { length: 50 }).notNull(),    
+  features: text('features').array().notNull(),       
+});
+
+//JOINT TABLE DoctorServices Table
+export const DoctorServicesTable = pgTable('doctor_services', {
+  doctorId: integer('doctor_id').notNull().references(() => DoctorsTable.doctorId, { onDelete: 'cascade' }),
+  serviceId: integer('service_id').notNull().references(() => ServicesTable.serviceId, { onDelete: 'cascade' })
+});
+
 // Appointments Table
 export const AppointmentsTable = pgTable("appointments", {
   appointmentId: serial("appointment_id").primaryKey(),
@@ -84,6 +99,7 @@ export const ComplaintsTable = pgTable("complaints", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
+
 //RELATIONSHIPS
 
 // UsersTable Relationships - 1 user can have many appointments, prescriptions, complaints
@@ -101,6 +117,18 @@ export const DoctorRelations = relations(DoctorsTable, ({ one, many }) => ({
   }),
   appointments: many(AppointmentsTable),
   prescriptions: many(PrescriptionsTable)
+}));
+
+//DoctorService Join Table relationships
+export const DoctorServicesRelations = relations(DoctorServicesTable, ({ one }) => ({
+  doctor: one(DoctorsTable, {
+    fields: [DoctorServicesTable.doctorId],
+    references: [DoctorsTable.doctorId]
+  }),
+  service: one(ServicesTable, {
+    fields: [DoctorServicesTable.serviceId],
+    references: [ServicesTable.serviceId]
+  })
 }));
 
 // AppointmentsTable Relationships - 1 appointment belongs to 1 user and 1 doctor, can have 1 payment and 1 prescription
@@ -165,19 +193,30 @@ export type TIUser = typeof UsersTable.$inferInsert & {
 };
 
 export type TSUser = typeof UsersTable.$inferSelect;
-// New type specifically for the login service input
 export type TSUserLoginInput = {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 };
+
 export type TIDoctor = typeof DoctorsTable.$inferInsert;
 export type TSDoctor = typeof DoctorsTable.$inferSelect;
+
 export type TIAppointment = typeof AppointmentsTable.$inferInsert;
 export type TSAppointment = typeof AppointmentsTable.$inferSelect;
+
 export type TIPrescription = typeof PrescriptionsTable.$inferInsert;
 export type TSPrescription = typeof PrescriptionsTable.$inferSelect;
+
 export type TIPayment = typeof PaymentsTable.$inferInsert;
 export type TSPayment = typeof PaymentsTable.$inferSelect;
+
 export type TIComplaint = typeof ComplaintsTable.$inferInsert;
 export type TSComplaint = typeof ComplaintsTable.$inferSelect;
+
+export type TIService = typeof ServicesTable.$inferInsert;
+export type TSService = typeof ServicesTable.$inferSelect;
+
+export type TIDoctorService = typeof DoctorServicesTable.$inferInsert;
+export type TSDoctorService = typeof DoctorServicesTable.$inferSelect;
+
 export type Role = "user" | "admin" | "doctor";
