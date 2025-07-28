@@ -3,6 +3,7 @@ import {
   createServiceController,
   getAllServicesController,
   getServiceByIdController,
+  getServiceByTitleController,
   updateServiceController,
   deleteServiceController,
 } from "./service.controller";
@@ -30,6 +31,17 @@ const service = (app: Express) => {
     async (req, res, next) => {
       try {
         await getAllServicesController(req, res);
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
+
+  // Get service by Title (public route)
+  app.route("/service/:title").get(
+    async (req, res, next) => {
+      try {
+        await getServiceByTitleController(req, res);
       } catch (error) {
         next(error);
       }

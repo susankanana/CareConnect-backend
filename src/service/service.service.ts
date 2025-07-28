@@ -3,27 +3,35 @@ import db from "../drizzle/db";
 import { ServicesTable, TIService } from "../drizzle/schema";
 
 // Create a new service
-export const createService = async (service: TIService) => {
+export const createServiceService = async (service: TIService) => {
   const [created] = await db.insert(ServicesTable).values(service).returning();
   return created;
 };
 
 // Get all services
-export const getAllServices = async () => {
+export const getAllServicesService = async () => {
   const services = await db.select().from(ServicesTable);
   return services;
 };
 
 // Get service by ID
-export const getServiceById = async (id: number) => {
+export const getServiceByIdService = async (id: number) => {
   const service = await db.query.ServicesTable.findFirst({
     where: eq(ServicesTable.serviceId, id),
   });
   return service;
 };
 
+//Get service by title
+export const getServiceByTitleService = async (title: string) => {
+  const service = await db.query.ServicesTable.findFirst({
+    where: eq(ServicesTable.title, title as any),
+  });
+  return service;
+};
+
 // Update service
-export const updateService = async (id: number, data: Partial<TIService>) => {
+export const updateServiceService = async (id: number, data: Partial<TIService>) => {
   const [updated] = await db
     .update(ServicesTable)
     .set(data)
@@ -33,7 +41,7 @@ export const updateService = async (id: number, data: Partial<TIService>) => {
 };
 
 // Delete service
-export const deleteService = async (id: number) => {
+export const deleteServiceService = async (id: number) => {
   const [deleted] = await db
     .delete(ServicesTable)
     .where(eq(ServicesTable.serviceId, id))
