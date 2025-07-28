@@ -3,6 +3,7 @@ import app from "../../src";
 import db from "../../src/drizzle/db";
 import bcrypt from "bcryptjs";
 import { UsersTable, DoctorsTable, AppointmentsTable, PrescriptionsTable } from "../../src/drizzle/schema";
+import { eq, or} from 'drizzle-orm';
 
 // Auth tokens
 let adminToken: string;
@@ -43,16 +44,11 @@ const patientUser = {
 };
 
 const testDoctorProfile = {
-  specialization: "Cardiology",
+  specialization: "Testology",
   availableDays: ["Monday", "Wednesday"],
 };
 
 beforeAll(async () => {
-  await db.delete(PrescriptionsTable);
-  await db.delete(AppointmentsTable);
-  await db.delete(DoctorsTable);
-  await db.delete(UsersTable);
-
   const [admin] = await db.insert(UsersTable).values({
     ...adminUser,
     password: bcrypt.hashSync(adminUser.password, 10),
@@ -105,10 +101,19 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await db.delete(PrescriptionsTable);
-  await db.delete(AppointmentsTable);
-  await db.delete(DoctorsTable);
-  await db.delete(UsersTable);
+  if (prescriptionId) {
+    await db.delete(PrescriptionsTable).where(eq(PrescriptionsTable.prescriptionId, prescriptionId));
+  }
+  await db.delete(AppointmentsTable)
+    .where(or(
+      eq(AppointmentsTable.userId, patientId),
+      eq(AppointmentsTable.doctorId, doctorId)
+    ));
+
+  await db.delete(DoctorsTable).where(eq(DoctorsTable.doctorId, doctorId));
+  await db.delete(UsersTable).where(eq(UsersTable.email, patientUser.email));
+  await db.delete(UsersTable).where(eq(UsersTable.email, adminUser.email));
+  await db.delete(UsersTable).where(eq(UsersTable.email, doctorUser.email));
 });
 
 describe("Prescription Controller Integration Tests", () => {

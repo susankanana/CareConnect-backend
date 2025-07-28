@@ -3,6 +3,7 @@ import app from "../../src";
 import db from "../../src/drizzle/db";
 import bcrypt from "bcryptjs";
 import { UsersTable, DoctorsTable, AppointmentsTable, PaymentsTable } from "../../src/drizzle/schema";
+import { eq, or } from 'drizzle-orm';
 
 let adminToken: string;
 let userToken: string;
@@ -44,11 +45,6 @@ const testDoctorProfile = {
 
 describe("Payment Controller Integration Tests", () => {
   beforeAll(async () => {
-    await db.delete(PaymentsTable);
-    await db.delete(AppointmentsTable);
-    await db.delete(DoctorsTable);
-    await db.delete(UsersTable);
-
     const [admin] = await db.insert(UsersTable).values({
       ...adminUser,
       password: bcrypt.hashSync(adminUser.password, 10),
@@ -101,10 +97,16 @@ describe("Payment Controller Integration Tests", () => {
   });
 
   afterAll(async () => {
-    await db.delete(PaymentsTable);
-    await db.delete(AppointmentsTable);
-    await db.delete(DoctorsTable);
-    await db.delete(UsersTable);
+    await db.delete(PaymentsTable).where(eq(PaymentsTable.paymentId, paymentId));;
+    await db.delete(AppointmentsTable)
+    .where(
+      eq(AppointmentsTable.doctorId, doctorId)
+    );
+
+    await db.delete(DoctorsTable).where(eq(DoctorsTable.doctorId, doctorId));
+    await db.delete(UsersTable).where(eq(UsersTable.email, normalUser.email));
+    await db.delete(UsersTable).where(eq(UsersTable.email, adminUser.email));
+    await db.delete(UsersTable).where(eq(UsersTable.email, doctorUser.email));
   });
 
   it("should get all payments (admin only)", async () => {

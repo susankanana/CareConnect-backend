@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import app from '../../src';
 import db from '../../src/drizzle/db';
 import { UsersTable } from '../../src/drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 let userId: number;
 const testUser = {
@@ -14,8 +15,7 @@ const testUser = {
   isVerified: true
 };
 
-beforeEach(async () => {
-  await db.delete(UsersTable);
+beforeAll(async () => {
   const [user] = await db.insert(UsersTable).values({
     firstName: testUser.firstName,
     lastName: testUser.lastName,
@@ -26,6 +26,11 @@ beforeEach(async () => {
   }).returning();
   userId = user.userId;
 });
+
+afterAll(async () => {
+  await db.delete(UsersTable).where(eq(UsersTable.email, testUser.email));
+});
+
 
 describe("Auth Controller - User CRUD", () => {
   it("Should get all users", async () => {

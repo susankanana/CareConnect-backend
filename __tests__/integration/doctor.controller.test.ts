@@ -3,6 +3,7 @@ import app from "../../src";
 import db from "../../src/drizzle/db";
 import bcrypt from "bcryptjs";
 import { UsersTable, DoctorsTable } from "../../src/drizzle/schema";
+import { eq } from 'drizzle-orm';
 
 let adminToken: string;
 let doctorToken: string;
@@ -37,14 +38,11 @@ const customerUser = {
 };
 
 const testDoctorProfile = {
-  specialization: "Cardiology",
+  specialization: "Cardiologist",
   availableDays: ["Monday", "Wednesday"],
 };
 
 beforeAll(async () => {
-  await db.delete(DoctorsTable);
-  await db.delete(UsersTable);
-
   // Create admin
   await db
     .insert(UsersTable)
@@ -94,8 +92,10 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await db.delete(DoctorsTable);
-  await db.delete(UsersTable);
+  await db.delete(DoctorsTable).where(eq(DoctorsTable.doctorId, doctorId));
+  await db.delete(UsersTable).where(eq(UsersTable.email, customerUser.email));
+  await db.delete(UsersTable).where(eq(UsersTable.email, adminUser.email));
+  await db.delete(UsersTable).where(eq(UsersTable.email, doctorUser.email));
 });
 
 describe("Doctor Controller Integration Tests", () => {

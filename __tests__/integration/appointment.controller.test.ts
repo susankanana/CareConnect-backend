@@ -3,6 +3,8 @@ import app from "../../src";
 import db from "../../src/drizzle/db";
 import bcrypt from "bcryptjs";
 import { UsersTable, DoctorsTable, AppointmentsTable } from "../../src/drizzle/schema";
+import { eq } from 'drizzle-orm';
+import user from "../../src/auth/auth.router";
 
 // Auth tokens
 let adminToken: string;
@@ -41,11 +43,12 @@ const customerUser = {
   isVerified: true,
 };
 
-beforeAll(async () => {
-  await db.delete(AppointmentsTable);
-  await db.delete(DoctorsTable);
-  await db.delete(UsersTable);
+const testDoctorProfile = {
+  specialization: "Testology",
+  availableDays: ["Monday", "Wednesday"],
+};
 
+beforeAll(async () => {
   // Create users and doctor
   const [admin] = await db.insert(UsersTable).values({
     ...adminUser,
@@ -60,9 +63,10 @@ beforeAll(async () => {
 
   await db.insert(DoctorsTable).values({
     doctorId: doctor.userId,
-    specialization: "Cardiology",
-    availableDays: ["Monday", "Wednesday"],
+    specialization: testDoctorProfile.specialization,
+    availableDays: testDoctorProfile.availableDays,
   });
+
 
   const [customer] = await db.insert(UsersTable).values({
     ...customerUser,
@@ -88,9 +92,11 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await db.delete(AppointmentsTable);
-  await db.delete(DoctorsTable);
-  await db.delete(UsersTable);
+  await db.delete(UsersTable).where(eq(UsersTable.email, customerUser.email));
+  await db.delete(UsersTable).where(eq(UsersTable.email, adminUser.email));
+  await db.delete(UsersTable).where(eq(UsersTable.email, doctorUser.email));
+  // await db.delete(AppointmentsTable).where(eq(AppointmentsTable.userId, userId));
+  await db.delete(DoctorsTable).where(eq(DoctorsTable.specialization, testDoctorProfile.specialization));
 });
 
 describe("Appointment Controller Integration Tests", () => {

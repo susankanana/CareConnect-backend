@@ -189,18 +189,25 @@ describe("Appointment Service", () => {
 
   it("should get appointments by doctor ID", async () => {
   const mockAppointments = [
-    {
-      appointmentId: 1,
-      userId: 3,
-      doctorId: 2,
-      appointmentDate: "2025-07-10",
-      timeSlot: "10:00:00",
-      totalAmount: "6500.00",
-      appointmentStatus: "Confirmed",
-      createdAt: new Date(),
-      updatedAt: new Date()
+  {
+    appointmentId: 1,
+    appointmentDate: "2025-07-10",
+    timeSlot: "10:00:00",
+    status: "Confirmed",
+    totalAmount: "6500.00",
+    patient: {
+      name: "Jane",
+      lastName: "Doe"
+    },
+    doctor: {
+      id: 2,
+      name: "John",
+      lastName: "Smith",
+      specialization: "Cardiology"
     }
-  ];
+  }
+];
+
 
   (db.query.AppointmentsTable.findMany as jest.Mock).mockResolvedValue(mockAppointments);
 
@@ -210,18 +217,25 @@ describe("Appointment Service", () => {
 
 it("should get appointments by status", async () => {
   const mockAppointments = [
-    {
-      appointmentId: 2,
-      userId: 4,
-      doctorId: 1,
-      appointmentDate: "2025-07-12",
-      timeSlot: "14:00:00",
-      totalAmount: "6500.00",
-      appointmentStatus: "Pending",
-      createdAt: new Date(),
-      updatedAt: new Date()
+  {
+    appointmentId: 1,
+    appointmentDate: "2025-07-10",
+    timeSlot: "10:00:00",
+    status: "Confirmed",
+    totalAmount: "6500.00",
+    patient: {
+      name: "Jane",
+      lastName: "Doe"
+    },
+    doctor: {
+      id: 2,
+      name: "John",
+      lastName: "Smith",
+      specialization: "Cardiology"
     }
-  ];
+  }
+];
+
 
   (db.query.AppointmentsTable.findMany as jest.Mock).mockResolvedValue(mockAppointments);
 
@@ -250,14 +264,15 @@ it("should get appointments by status", async () => {
       }
     ];
 
-    (db.select as jest.Mock).mockReturnValue({
+    (db.select as jest.Mock).mockReturnValue({ 
       from: jest.fn().mockReturnValue({
         leftJoin: jest.fn().mockReturnValue({
-          leftJoin: jest.fn().mockResolvedValue(mockDetailedAppointments)
+          leftJoin: jest.fn().mockReturnValue({
+            leftJoin: jest.fn().mockResolvedValue(mockDetailedAppointments)
+          })
         })
       })
     });
-
     const result = await getDetailedAppointmentsService();
     expect(result).toEqual(mockDetailedAppointments);
   });

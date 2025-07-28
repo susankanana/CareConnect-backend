@@ -12,8 +12,7 @@ const testUser = {
   password: "loginpass123"
 };
 
-beforeEach(async () => {
-  await db.delete(UsersTable).where(eq(UsersTable.email, testUser.email));
+beforeAll(async () => {
   await db.insert(UsersTable).values({
     ...testUser,
     password: bcrypt.hashSync(testUser.password, 10),
@@ -21,7 +20,7 @@ beforeEach(async () => {
   });
 });
 
-afterEach(async () => {
+afterAll(async () => {
   await db.delete(UsersTable).where(eq(UsersTable.email, testUser.email));
 });
 

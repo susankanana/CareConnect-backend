@@ -3,6 +3,7 @@ import app from "../../src";
 import db from "../../src/drizzle/db";
 import bcrypt from "bcryptjs";
 import { UsersTable, ComplaintsTable } from "../../src/drizzle/schema";
+import { eq } from 'drizzle-orm';
 
 let adminToken: string;
 let userToken: string;
@@ -28,9 +29,6 @@ const normalUser = {
 };
 
 beforeAll(async () => {
-  await db.delete(ComplaintsTable);
-  await db.delete(UsersTable);
-
   const [admin] = await db.insert(UsersTable).values({
     ...adminUser,
     password: bcrypt.hashSync(adminUser.password, 10),
@@ -55,8 +53,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await db.delete(ComplaintsTable);
-  await db.delete(UsersTable);
+  await db.delete(ComplaintsTable).where(eq(ComplaintsTable.userId, userId));
+  await db.delete(UsersTable).where(eq(UsersTable.email, normalUser.email));
+  await db.delete(UsersTable).where(eq(UsersTable.email, adminUser.email));
 });
 
 describe("Complaint Controller Integration Tests", () => {

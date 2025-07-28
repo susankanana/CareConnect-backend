@@ -2,7 +2,8 @@ import request from 'supertest';
 import bcrypt from 'bcryptjs';
 import app from '../../src';
 import db from '../../src/drizzle/db';
-import { UsersTable, PrescriptionsTable } from '../../src/drizzle/schema';
+import { UsersTable } from '../../src/drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 const testUser = {
   firstName: "Register",
@@ -11,9 +12,8 @@ const testUser = {
   password: "testpassword123"
 };
 
-beforeEach(async () => {
-  await db.delete(PrescriptionsTable);
-  await db.delete(UsersTable);
+afterAll(async () => {
+  await db.delete(UsersTable).where(eq(UsersTable.email, testUser.email));
 });
 
 describe("POST /auth/register", () => {
@@ -30,12 +30,6 @@ describe("POST /auth/register", () => {
   });
 
   it("should not register a user with an existing email", async () => {
-  // First registration
-  await request(app).post("/auth/register").send({
-    ...testUser,
-    password: bcrypt.hashSync(testUser.password, 10)
-  });
-
   // Second attempt with the same email
   const res = await request(app).post("/auth/register").send({
     ...testUser,
