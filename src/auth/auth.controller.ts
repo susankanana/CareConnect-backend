@@ -79,7 +79,7 @@ export const verifyUserController = async (req: Request, res: Response) => {
                             You can now log in and start managing your appointments with ease.
                         </p>
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="https://care-connect-frontend.vercel.app/auth/login"
+                            <a href="https://care-connect-frontend.vercel.app/login"
                                 style="background: linear-gradient(to right, #14b8a6, #ec4899); color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
                                 Log In to CareConnect
                             </a>
