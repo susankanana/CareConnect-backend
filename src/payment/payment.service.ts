@@ -27,7 +27,7 @@ export const createCheckoutSessionService = async (appointmentId: number) => {
           currency: "kes",
           product_data: {
             name: "Hospital Appointment",
-            images: ["http://localhost:8081/images/CareConnect.jpg"]
+            images: ["https://images.pexels.com/photos/5207102/pexels-photo-5207102.jpeg"]
           },
           unit_amount: Math.round(amount * 100),
         },
