@@ -1,39 +1,34 @@
 import { Express, Request, Response } from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export default function aiAssistant(app: Express) {
-  app.post('/api/ai-assistant', async (req: Request, res: Response) => {
-    const { message } = req.body;
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error("GEMINI_API_KEY environment variable is not set.");
+}
 
-    if (!message) {
-      res.status(400).json({ error: "Message is required" });
-      return;
-    }
+const genAI = new GoogleGenerativeAI(apiKey);
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      console.error("GEMINI_API_KEY environment variable is not set.");
-      res.status(500).json({ error: "Server configuration error: Gemini API key is missing." });
-      return;
-    }
+export default function aiAssistant(app: Express): void {
+  app.post('/api/ai-assistant', (req: Request, res: Response): void => {
+    (async () => {
+      const { message } = req.body;
 
-    try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-preview-05-20",
-      });
-
-      const chat = model.startChat({ history: [] });
-
-      const result = await chat.sendMessage(message);
-      const reply = result.response.text() || "Sorry, I couldn't understand that.";
-
-      res.status(200).json({ reply });
-    } catch (err: any) {
-        const message = err?.message || JSON.stringify(err);
-        console.error("Gemini API error:", message);
-        res.status(500).json({ error: message });
+      if (!message) {
+        res.status(400).json({ error: "Message is required" });
+        return;
       }
+
+      try {
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const result = await model.generateContent(message);
+        const response = await result.response;
+        const text = response.text();
+
+        res.status(200).json({ reply: text });
+      } catch (err) {
+        console.error("Gemini API error:", err);
+        res.status(500).json({ error: "Failed to get AI response" });
+      }
+    })();
   });
 }
