@@ -8,6 +8,7 @@ import appointment from './appointment/appointment.router';
 import prescription from './prescription/prescription.router';
 import complaint from './complaint/complaint.router';
 import payment from './payment/payment.router';
+import aiAssistant from './gemini/geminiAI.router';
 import { stripeWebhookController } from './payment/payment.controller';
 import service from './service/service.router';
 
@@ -26,6 +27,8 @@ const initializeApp = () => {
       }
     }
   );
+
+  aiAssistant(app); //aiAssistant function is a route configurator that takes your Express app instance (app) as an argument and then sets up a new route on it. 
 
   // General middlewares
   app.use(express.json()); // Used to parse JSON bodies

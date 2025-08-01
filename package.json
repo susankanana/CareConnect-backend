@@ -51,6 +51,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@neondatabase/serverless": "^1.0.1",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.3",
