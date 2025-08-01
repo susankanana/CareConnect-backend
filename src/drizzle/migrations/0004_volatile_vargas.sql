@@ -1,0 +1,1 @@
+ALTER TABLE "payments" ADD COLUMN "payment_method" varchar(50) DEFAULT 'Unknown' NOT NULL;

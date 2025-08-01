@@ -80,6 +80,7 @@ export const PaymentsTable = pgTable("payments", {
   paymentId: serial("payment_id").primaryKey(),
   appointmentId: integer("appointment_id").notNull().references(() => AppointmentsTable.appointmentId, { onDelete: "cascade" }),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: varchar("payment_method", { length: 50 }).notNull().default("Unknown"),
   paymentStatus: varchar("payment_status", { length: 50 }),
   transactionId: varchar("transaction_id", { length: 100 }),
   paymentDate: timestamp("payment_date"),
