@@ -2,7 +2,7 @@ import { Express, Request, Response } from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export default function aiAssistant(app: Express) {
-  app.post('/ai', async (req: Request, res: Response) => {
+  app.post('/api/ai-assistant', async (req: Request, res: Response) => {
     const { message } = req.body;
 
     if (!message) {
