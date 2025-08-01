@@ -28,8 +28,6 @@ const initializeApp = () => {
     }
   );
 
-  aiAssistant(app); //aiAssistant function is a route configurator that takes your Express app instance (app) as an argument and then sets up a new route on it. 
-
   // General middlewares
   app.use(express.json()); // Used to parse JSON bodies
   app.use(cors({
@@ -50,6 +48,8 @@ const initializeApp = () => {
   complaint(app);
   payment(app);
   service(app);
+  
+  aiAssistant(app); //aiAssistant function is a route configurator that takes your Express app instance (app) as an argument and then sets up a new route on it. 
 
   app.get('/', (_req, res) => {
     res.send('Hello, World!');
