@@ -27,10 +27,11 @@ export default function aiAssistant(app: Express): void {
         const text = response.text();
 
         res.status(200).json({ reply: text });
-      } catch (err) {
-        console.error("Gemini API error:", err);
-        res.status(500).json({ error: "Failed to get AI response" });
-      }
+      } catch (err: any) {
+          console.error("Gemini API error:", err?.response?.data || err.message || err);
+          res.status(500).json({ error: "Failed to get AI response" });
+        }
+      
     })();
   });
 
