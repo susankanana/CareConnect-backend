@@ -44,9 +44,6 @@ importers:
       nodemailer:
         specifier: ^7.0.4
         version: 7.0.4
-      openai:
-        specifier: ^5.11.0
-        version: 5.11.0
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -1926,18 +1923,6 @@ packages:
   onetime@5.1.2:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
     engines: {node: '>=6'}
-
-  openai@5.11.0:
-    resolution: {integrity: sha512-+AuTc5pVjlnTuA9zvn8rA/k+1RluPIx9AD4eDcnutv6JNwHHZxIhkFy+tmMKCvmMFDQzfA/r1ujvPWB19DQkYg==}
-    hasBin: true
-    peerDependencies:
-      ws: ^8.18.0
-      zod: ^3.23.8
-    peerDependenciesMeta:
-      ws:
-        optional: true
-      zod:
-        optional: true
 
   p-limit@2.3.0:
     resolution: {integrity: sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==}
@@ -4376,8 +4361,6 @@ snapshots:
   onetime@5.1.2:
     dependencies:
       mimic-fn: 2.1.0
-
-  openai@5.11.0: {}
 
   p-limit@2.3.0:
     dependencies:
