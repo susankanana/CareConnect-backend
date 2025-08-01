@@ -42,7 +42,7 @@ const payment = (app: Express) => {
 
   // Get all payments (admin only)
   app.route("/payments").get(
-    adminRoleAuth,
+    allRoleAuth,
     async (req, res, next) => {
       try {
         await getAllPaymentsController(req, res);
