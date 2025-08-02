@@ -165,7 +165,15 @@ export const updatePaymentStatusService = async ({
   paymentStatus: "Paid" | "Failed";
   paymentDate: Date;
 }) => {
-  await db.update(PaymentsTable)
+  console.log("🔄 Trying to update payment with:", {
+    appointmentId,
+    transactionId,
+    amount,
+    paymentStatus,
+    paymentDate,
+  });
+  console.log("👉 Updating payment for appointmentId:", appointmentId);
+  const result = await db.update(PaymentsTable)
     .set({
       transactionId,
       amount,
@@ -173,4 +181,5 @@ export const updatePaymentStatusService = async ({
       paymentDate,
     })
     .where(eq(PaymentsTable.appointmentId, appointmentId));
+    console.log("🔧 Update result:", result); 
 };
