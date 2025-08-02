@@ -9,6 +9,65 @@ import {
   updatePaymentStatusService
 } from "./payment.service";
 import { getAppointmentByIdService } from "../appointment/appointment.service";
+import { initiateMpesaStkPushService } from "./payment.service";
+
+//------------------MPESA-----------------
+
+// Trigger M-Pesa STK Push
+export const initiateMpesaPaymentController = async (req: Request, res: Response) => {
+  try {
+    const { appointmentId, phone } = req.body;
+
+    if (!appointmentId || !phone) {
+      return res.status(400).json({ message: "appointmentId and phone are required" });
+    }
+
+    const result = await initiateMpesaStkPushService(appointmentId, phone);
+    return res.status(200).json({ message: "STK Push initiated", data: result });
+  } catch (error: any) {
+    console.error("M-PESA STK Push Error:", error.response?.data || error.message);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// M-Pesa Callback Route
+export const mpesaCallbackController = async (req: Request, res: Response) => {
+  try {
+    const body = req.body;
+
+    const callback = body?.Body?.stkCallback;
+    const resultCode = callback?.ResultCode;
+    const metadata = callback?.CallbackMetadata;
+
+    if (resultCode === 0 && metadata) {
+      const transactionId = metadata?.Item?.find((item: any) => item.Name === "MpesaReceiptNumber")?.Value;
+      const amount = metadata?.Item?.find((item: any) => item.Name === "Amount")?.Value;
+      const accountRef = callback?.MerchantRequestID || "";
+      const appointmentId = parseInt(accountRef.split("-")[1]);
+
+      await createPaymentRecordService({
+        appointmentId,
+        amount: Number(amount).toFixed(2),
+        paymentMethod: "M-Pesa",
+        paymentStatus: "Paid",
+        transactionId,
+        paymentDate: new Date(),
+      });
+
+      console.log("M-PESA Payment Recorded");
+    } else {
+      console.warn("M-PESA payment failed or cancelled");
+    }
+
+    return res.status(200).json({ message: "Callback received" });
+  } catch (error: any) {
+    console.error("M-PESA Callback Error:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+
+//--------------------------STRIPE------------------------
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -54,6 +113,7 @@ export const stripeWebhookController = async (req: Request, res: Response) => {
       await createPaymentRecordService({
         appointmentId,
         amount: amountPaid.toFixed(2),
+        paymentMethod: "Stripe",
         paymentStatus: "Paid",
         transactionId,
         paymentDate: new Date(),
@@ -86,6 +146,7 @@ export const createCheckoutSessionController = async (req: Request, res: Respons
   }
 };
 
+//----------------------------------------------------------------
 
 // Get All Payments
 export const getAllPaymentsController = async (_req: Request, res: Response) => {

@@ -4,7 +4,9 @@ import {
   getAllPaymentsController,
   getPaymentByIdController,
   getPaymentsByAppointmentController,
-  updatePaymentStatusController
+  updatePaymentStatusController,
+  initiateMpesaPaymentController,
+  mpesaCallbackController
 } from "./payment.controller";
 
 import {
@@ -14,6 +16,34 @@ import {
 } from "../middleware/bearerAuth";
 
 const payment = (app: Express) => {
+
+  //----------------------------MPESA------------------------
+
+  // M-Pesa Payment Initiation (user only)
+app.route("/payment/mpesa/initiate").post(
+  userRoleAuth,
+  async (req, res, next) => {
+    try {
+      await initiateMpesaPaymentController(req, res);
+    } catch (error: any) {
+      next(error);
+    }
+  }
+);
+
+// M-Pesa Callback (no auth)
+app.route("/payment/mpesa/callback").post(
+  async (req, res, next) => {
+    try {
+      await mpesaCallbackController(req, res);
+    } catch (error: any) {
+      next(error);
+    }
+  }
+);
+
+  //------------------------------STRIPE-------------------
+
   // Create Stripe Checkout Session (user only)
   app.route("/payment/checkout-session").post(
     userRoleAuth,

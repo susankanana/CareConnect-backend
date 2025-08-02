@@ -2,6 +2,70 @@ import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import db from "../drizzle/db";
 import { PaymentsTable, TIPayment, AppointmentsTable } from "../drizzle/schema";
+import axios from "axios"; //used with mpesa
+
+//----------------------------MPESA---------------------
+
+const mpesaBaseUrl = "https://sandbox.safaricom.co.ke";
+const consumerKey = process.env.MPESA_CONSUMER_KEY!;
+const consumerSecret = process.env.MPESA_CONSUMER_SECRET!;
+const shortCode = process.env.MPESA_SHORTCODE!; // e.g., 174379 (sandbox)
+const passkey = process.env.MPESA_PASSKEY!;
+const callbackUrl = `${process.env.SERVER_URL}/api/payment/mpesa/callback`;
+
+const getMpesaAccessToken = async () => {
+  const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
+  const res = await axios.get(`${mpesaBaseUrl}/oauth/v1/generate?grant_type=client_credentials`, {
+    headers: {
+      Authorization: `Basic ${auth}`,
+    },
+  });
+  return res.data.access_token;
+};
+
+export const initiateMpesaStkPushService = async (appointmentId: number, phone: string) => {
+  const appointment = await db.query.AppointmentsTable.findFirst({
+    where: eq(AppointmentsTable.appointmentId, appointmentId),
+  });
+
+  if (!appointment) throw new Error("Appointment not found");
+
+  const amount = Number(appointment.totalAmount);
+  if (!amount || amount <= 0) throw new Error("Invalid amount");
+
+  const token = await getMpesaAccessToken();
+
+  const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
+  const password = Buffer.from(`${shortCode}${passkey}${timestamp}`).toString("base64");
+
+  const payload = {
+    BusinessShortCode: shortCode,
+    Password: password,
+    Timestamp: timestamp,
+    TransactionType: "CustomerPayBillOnline",
+    Amount: amount,
+    PartyA: phone,
+    PartyB: shortCode,
+    PhoneNumber: phone,
+    CallBackURL: callbackUrl,
+    AccountReference: `CareConnect-${appointmentId}`,
+    TransactionDesc: "CareConnect Appointment Payment",
+  };
+
+  const response = await axios.post(
+    `${mpesaBaseUrl}/mpesa/stkpush/v1/processrequest`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+//-----------------------STRIPE---------------------------------
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -45,6 +109,7 @@ export const createCheckoutSessionService = async (appointmentId: number) => {
   return session.url;
 };
 
+//----------------------------------------------------------------------
 
 // Save payment record (after successful webhook or frontend confirmation)
 export const createPaymentRecordService = async (payment: TIPayment) => {
