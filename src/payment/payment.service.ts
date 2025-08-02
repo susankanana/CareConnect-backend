@@ -11,7 +11,7 @@ const consumerKey = process.env.MPESA_CONSUMER_KEY!;
 const consumerSecret = process.env.MPESA_CONSUMER_SECRET!;
 const shortCode = process.env.MPESA_SHORTCODE!; // e.g., 174379 (sandbox)
 const passkey = process.env.MPESA_PASSKEY!;
-const callbackUrl = `${process.env.SERVER_URL}/api/payment/mpesa/callback`;
+const callbackUrl = `${process.env.SERVER_URL}/payment/mpesa/callback`;
 
 const getMpesaAccessToken = async () => {
   const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
