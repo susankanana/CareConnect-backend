@@ -24,45 +24,55 @@ const getMpesaAccessToken = async () => {
 };
 
 export const initiateMpesaStkPushService = async (appointmentId: number, phone: string) => {
-  const appointment = await db.query.AppointmentsTable.findFirst({
+
+  console.log("🛠 initiateMpesaStkPushService CALLED");
+
+  try{
+    const appointment = await db.query.AppointmentsTable.findFirst({
     where: eq(AppointmentsTable.appointmentId, appointmentId),
-  });
+    });
 
-  if (!appointment) throw new Error("Appointment not found");
+    if (!appointment) throw new Error("Appointment not found");
+    const amount = Number(appointment.totalAmount);
+    if (!amount || amount <= 0) throw new Error("Invalid amount");
 
-  const amount = Number(appointment.totalAmount);
-  if (!amount || amount <= 0) throw new Error("Invalid amount");
+    const token = await getMpesaAccessToken();
+    console.log("🔐 Got Access Token");
 
-  const token = await getMpesaAccessToken();
+    const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
+    const password = Buffer.from(`${shortCode}${passkey}${timestamp}`).toString("base64");
 
-  const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
-  const password = Buffer.from(`${shortCode}${passkey}${timestamp}`).toString("base64");
-
-  const payload = {
-    BusinessShortCode: shortCode,
-    Password: password,
-    Timestamp: timestamp,
-    TransactionType: "CustomerPayBillOnline",
-    Amount: 10,  //should pass amount but I'll use 1sh for testing
-    PartyA: phone,
-    PartyB: shortCode,
-    PhoneNumber: phone,
-    CallBackURL: callbackUrl,
-    AccountReference: `CareConnect-${appointmentId}`,
-    TransactionDesc: "CareConnect Appointment Payment",
-  };
-  console.log("🚀 STK Payload:", payload);
-  const response = await axios.post(
-    `${mpesaBaseUrl}/mpesa/stkpush/v1/processrequest`,
-    payload,
-    {
-      headers: {
+    const payload = {
+      BusinessShortCode: shortCode,
+      Password: password,
+      Timestamp: timestamp,
+      TransactionType: "CustomerPayBillOnline",
+      Amount: 1,  //should pass amount but I'll use 1sh for testing
+      PartyA: phone,
+      PartyB: shortCode,
+      PhoneNumber: phone,
+      CallBackURL: callbackUrl,
+      AccountReference: `CareConnect-${appointmentId}`,
+      TransactionDesc: "CareConnect Appointment Payment",
+    };
+    console.log("🚀 STK Payload:", payload);
+    const response = await axios.post(
+      `${mpesaBaseUrl}/mpesa/stkpush/v1/processrequest`,
+      payload,
+      {
+        headers: {
         Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  return response.data;
+        "Content-Type": "application/json",
+        },
+      }
+    );
+  
+    console.log("✅ STK Push Response:", response.data);
+    return response.data;
+  } catch (error: any) {
+      console.error("🔥 STK Push Failed:", error?.response?.data || error.message);
+    throw error;
+  }
 };
 
 //-----------------------STRIPE---------------------------------
