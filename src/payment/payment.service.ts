@@ -43,7 +43,7 @@ export const initiateMpesaStkPushService = async (appointmentId: number, phone: 
     Password: password,
     Timestamp: timestamp,
     TransactionType: "CustomerPayBillOnline",
-    Amount: 1,  //should pass amount but I'll use 1sh for testing
+    Amount: 10,  //should pass amount but I'll use 1sh for testing
     PartyA: phone,
     PartyB: shortCode,
     PhoneNumber: phone,
@@ -51,7 +51,7 @@ export const initiateMpesaStkPushService = async (appointmentId: number, phone: 
     AccountReference: `CareConnect-${appointmentId}`,
     TransactionDesc: "CareConnect Appointment Payment",
   };
-
+  console.log("🚀 STK Payload:", payload);
   const response = await axios.post(
     `${mpesaBaseUrl}/mpesa/stkpush/v1/processrequest`,
     payload,
