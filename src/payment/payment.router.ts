@@ -34,12 +34,18 @@ app.route("/payment/mpesa/initiate").post(
 app.route("/payment/mpesa/callback").post(
   async (req, res, next) => {
     try {
+      const body = req.body;
+
+      // ✅ Log full M-PESA callback body
+      console.log("📩 Callback Body:", JSON.stringify(body, null, 2));
+
       await mpesaCallbackController(req, res);
     } catch (error: any) {
       next(error);
     }
   }
 );
+
 
   //------------------------------STRIPE-------------------
 
