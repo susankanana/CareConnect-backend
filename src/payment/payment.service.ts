@@ -10,7 +10,9 @@ const mpesaBaseUrl = "https://sandbox.safaricom.co.ke";
 const consumerKey = process.env.MPESA_CONSUMER_KEY!;
 const consumerSecret = process.env.MPESA_CONSUMER_SECRET!;
 const shortCode = process.env.MPESA_SHORTCODE!; // e.g., 174379 (sandbox)
+console.log(`Shortcode length: ${shortCode.length}`);
 const passkey = process.env.MPESA_PASSKEY!;
+console.log(`Passkey length: ${passkey.length}`);
 const callbackUrl = `${process.env.SERVER_URL}/payment/mpesa/callback`;
 
 const getMpesaAccessToken = async () => {
