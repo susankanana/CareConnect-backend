@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import db from "../drizzle/db";
 import { PaymentsTable, TIPayment, AppointmentsTable } from "../drizzle/schema";
+import "dotenv/config"
 import axios from "axios"; //used with mpesa
 
 //----------------------------MPESA---------------------
@@ -41,7 +42,9 @@ export const initiateMpesaStkPushService = async (appointmentId: number, phone: 
     const token = await getMpesaAccessToken();
     console.log("🔐 Got Access Token");
 
-    const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
     const password = Buffer.from(`${shortCode}${passkey}${timestamp}`).toString("base64");
 
     const payload = {
