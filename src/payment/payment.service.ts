@@ -43,7 +43,7 @@ export const initiateMpesaStkPushService = async (appointmentId: number, phone: 
     Password: password,
     Timestamp: timestamp,
     TransactionType: "CustomerPayBillOnline",
-    Amount: amount,
+    Amount: 1,  //should pass amount but I'll use 1sh for testing
     PartyA: phone,
     PartyB: shortCode,
     PhoneNumber: phone,
