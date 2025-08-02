@@ -17,46 +17,106 @@ import { initiateMpesaStkPushService } from "./payment.service";
 export const initiateMpesaPaymentController = async (req: Request, res: Response) => {
   try {
     const { appointmentId, phone } = req.body;
+    console.log("🟡 M-PESA Initiation Requested");
+    console.log("📌 Request Body:", { appointmentId, phone });
 
     if (!appointmentId || !phone) {
       return res.status(400).json({ message: "appointmentId and phone are required" });
     }
 
+    // Mark payment as "Pending" before STK push
+    await createPaymentRecordService({
+      appointmentId,
+      amount: '0',
+      paymentMethod: "M-Pesa",
+      paymentStatus: "Pending",
+      transactionId: "",
+      paymentDate: new Date(),
+    });
+
     const result = await initiateMpesaStkPushService(appointmentId, phone);
+    console.log("✅ STK Push Initiated Successfully:", result);
+
     return res.status(200).json({ message: "STK Push initiated", data: result });
   } catch (error: any) {
-    console.error("M-PESA STK Push Error:", error.response?.data || error.message);
+    console.error("M-PESA STK Push Error:");
+    if (error.response) {
+      // Axios error with response from M-Pesa
+      console.error("🔴 Error Status:", error.response.status);
+      console.error("🔴 Error Data:", error.response.data);
+      console.error("🔴 Error Headers:", error.response.headers);
+    } else {
+      // Any other kind of error (network, logic, etc.)
+      console.error("🔴 Error Message:", error.message);
+    }
+
     return res.status(500).json({ error: error.message });
   }
 };
 
-// M-Pesa Callback Route
 export const mpesaCallbackController = async (req: Request, res: Response) => {
   try {
+    console.log("🟡 M-PESA Callback Received");
     const body = req.body;
+    console.log("📩 Callback Raw Body:", JSON.stringify(body, null, 2));
 
     const callback = body?.Body?.stkCallback;
+
+    if (!callback) {
+      console.warn("⚠️ Invalid callback format: 'stkCallback' not found");
+      return res.status(400).json({ message: "Invalid callback format" });
+    }
     const resultCode = callback?.ResultCode;
     const metadata = callback?.CallbackMetadata;
 
-    if (resultCode === 0 && metadata) {
+    console.log("📦 Parsed Callback:", {
+      resultCode,
+      metadata,
+    });
+
+   if (resultCode === 0 && metadata) {
       const transactionId = metadata?.Item?.find((item: any) => item.Name === "MpesaReceiptNumber")?.Value;
       const amount = metadata?.Item?.find((item: any) => item.Name === "Amount")?.Value;
       const accountRef = callback?.MerchantRequestID || "";
+
+      console.log("✅ Payment Success Detected");
+      console.log("💳 Transaction ID:", transactionId);
+      console.log("💰 Amount:", amount);
+      console.log("🆔 MerchantRequestID:", accountRef);
+
       const appointmentId = parseInt(accountRef.split("-")[1]);
 
-      await createPaymentRecordService({
+      await updatePaymentStatusService({
         appointmentId,
-        amount: Number(amount).toFixed(2),
-        paymentMethod: "M-Pesa",
-        paymentStatus: "Paid",
         transactionId,
+        amount: Number(amount).toFixed(2),
+        paymentStatus: "Paid",
         paymentDate: new Date(),
       });
 
-      console.log("M-PESA Payment Recorded");
+      console.log("📝 Payment status updated in DB");
     } else {
-      console.warn("M-PESA payment failed or cancelled");
+      console.warn("❌ M-PESA payment failed or cancelled");
+      console.warn("🔎 ResultCode:", resultCode);
+
+      const accountRef = callback?.MerchantRequestID || "";
+
+      const appointmentParts = accountRef.split("-");
+      const appointmentId = parseInt(appointmentParts?.[1]);
+
+      if (isNaN(appointmentId)) {
+        console.warn("⚠️ Could not parse appointmentId from MerchantRequestID:", accountRef);
+        return res.status(400).json({ message: "Invalid MerchantRequestID format" });
+      }
+
+
+      await updatePaymentStatusService({
+        appointmentId,
+        paymentStatus: "Failed",
+        paymentDate: new Date(),
+      });
+
+      console.log("📝 Failed payment status saved to DB");
     }
 
     return res.status(200).json({ message: "Callback received" });
@@ -192,27 +252,6 @@ export const getPaymentsByAppointmentController = async (req: Request, res: Resp
 
     const payments = await getPaymentsByAppointmentService(appointmentId);
     return res.status(200).json({ data: payments });
-  } catch (error: any) {
-    return res.status(500).json({ error: error.message });
-  }
-};
-
-// Update Payment Status
-export const updatePaymentStatusController = async (req: Request, res: Response) => {
-  try {
-    const paymentId = parseInt(req.params.id);
-    const { status } = req.body;
-
-    if (!status || typeof status !== "string") {
-      return res.status(400).json({ message: "Invalid or missing status" });
-    }
-
-    if (isNaN(paymentId)) {
-      return res.status(400).json({ message: "Invalid payment ID" });
-    }
-
-    const updated = await updatePaymentStatusService(paymentId, status);
-    return res.status(200).json({ message: "Payment status updated", data: updated });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }

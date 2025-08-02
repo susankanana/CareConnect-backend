@@ -4,7 +4,6 @@ import {
   getAllPaymentsController,
   getPaymentByIdController,
   getPaymentsByAppointmentController,
-  updatePaymentStatusController,
   initiateMpesaPaymentController,
   mpesaCallbackController
 } from "./payment.controller";
@@ -106,17 +105,6 @@ app.route("/payment/mpesa/callback").post(
     }
   );
 
-  // Update payment status (admin only)
-  app.route("/payment/status/:id").patch(
-    adminRoleAuth,
-    async (req, res, next) => {
-      try {
-        await updatePaymentStatusController(req, res);
-      } catch (error: any) {
-        next(error);
-      }
-    }
-  );
 };
 
 export default payment;

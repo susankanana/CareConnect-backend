@@ -137,20 +137,25 @@ export const getPaymentsByAppointmentService = async (appointmentId: number) => 
   });
 };
 
-// Update payment status (e.g., after confirmation via webhook)
-export const updatePaymentStatusService = async (
-  paymentId: number,
-  status: string
-) => {
-  const [updated] = await db
-    .update(PaymentsTable)
-    .set({ paymentStatus: status })
-    .where(eq(PaymentsTable.paymentId, paymentId))
-    .returning();
-
-  if (!updated) {
-    throw new Error("Payment not found or status update failed.");
-  }
-
-  return updated;
+export const updatePaymentStatusService = async ({
+  appointmentId,
+  transactionId,
+  amount,
+  paymentStatus,
+  paymentDate,
+}: {
+  appointmentId: number;
+  transactionId?: string;
+  amount?: string;
+  paymentStatus: "Paid" | "Failed";
+  paymentDate: Date;
+}) => {
+  await db.update(PaymentsTable)
+    .set({
+      transactionId,
+      amount,
+      paymentStatus,
+      paymentDate,
+    })
+    .where(eq(PaymentsTable.appointmentId, appointmentId));
 };
