@@ -66,25 +66,32 @@ export const mpesaCallbackController = async (req: Request, res: Response) => {
       console.warn("⚠️ Invalid callback format: 'stkCallback' not found");
       return res.status(400).json({ message: "Invalid callback format" });
     }
+
     const resultCode = callback?.ResultCode;
-    const metadata = callback?.CallbackMetadata;
+    const metadataItems = callback?.CallbackMetadata?.Item as { Name: string; Value: any }[] || [];
 
-    console.log("📦 Parsed Callback:", {
-      resultCode,
-      metadata,
-    });
+    console.log("📦 Parsed Callback:", { resultCode, metadataItems });
 
-   if (resultCode === 0 && metadata) {
-      const transactionId = metadata?.Item?.find((item: any) => item.Name === "MpesaReceiptNumber")?.Value;
-      const amount = metadata?.Item?.find((item: any) => item.Name === "Amount")?.Value;
-      const accountRef = callback?.MerchantRequestID || "";
+    // Get transaction details
+    const transactionId = metadataItems.find(item => item.Name === "MpesaReceiptNumber")?.Value;
+    const amount = metadataItems.find(item => item.Name === "Amount")?.Value;
 
+    // Extract account reference (used to get appointmentId)
+    const accountReferenceItem = metadataItems.find(item => item.Name === "AccountReference");
+    const accountRef = accountReferenceItem?.Value || callback?.MerchantRequestID || "";
+
+    const appointmentId = parseInt(accountRef.split("-")[1]);
+
+    if (isNaN(appointmentId)) {
+      console.warn("⚠️ Could not parse appointmentId from AccountReference:", accountRef);
+      return res.status(400).json({ message: "Invalid AccountReference format" });
+    }
+
+    if (resultCode === 0) {
       console.log("✅ Payment Success Detected");
       console.log("💳 Transaction ID:", transactionId);
       console.log("💰 Amount:", amount);
-      console.log("🆔 MerchantRequestID:", accountRef);
-
-      const appointmentId = parseInt(accountRef.split("-")[1]);
+      console.log("🆔 AccountRef:", accountRef);
 
       await updatePaymentStatusService({
         appointmentId,
@@ -94,21 +101,10 @@ export const mpesaCallbackController = async (req: Request, res: Response) => {
         paymentDate: new Date(),
       });
 
-      console.log("📝 Payment status updated in DB");
+      console.log("📝 Payment status updated in DB (Success)");
     } else {
       console.warn("❌ M-PESA payment failed or cancelled");
       console.warn("🔎 ResultCode:", resultCode);
-
-      const accountRef = callback?.MerchantRequestID || "";
-
-      const appointmentParts = accountRef.split("-");
-      const appointmentId = parseInt(appointmentParts?.[1]);
-
-      if (isNaN(appointmentId)) {
-        console.warn("⚠️ Could not parse appointmentId from MerchantRequestID:", accountRef);
-        return res.status(400).json({ message: "Invalid MerchantRequestID format" });
-      }
-
 
       await updatePaymentStatusService({
         appointmentId,
@@ -116,12 +112,12 @@ export const mpesaCallbackController = async (req: Request, res: Response) => {
         paymentDate: new Date(),
       });
 
-      console.log("📝 Failed payment status saved to DB");
+      console.log("📝 Payment status updated in DB (Failure)");
     }
 
     return res.status(200).json({ message: "Callback received" });
   } catch (error: any) {
-    console.error("M-PESA Callback Error:", error.message);
+    console.error("❗ M-PESA Callback Error:", error.message);
     return res.status(500).json({ error: error.message });
   }
 };
