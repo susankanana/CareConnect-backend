@@ -272,7 +272,7 @@ export const checkPaymentStatusByAppointmentIdController = async (req: Request, 
 
     const isPaid = await checkPaymentStatusByAppointmentIdService(appointmentId);
     
-    return res.status(200).json({ data: isPaid });
+    return res.status(200).json({ status: isPaid ? "Paid" : "Unpaid" });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
