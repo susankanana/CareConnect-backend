@@ -13,6 +13,19 @@ import { initiateMpesaStkPushService } from "./payment.service";
 
 //------------------MPESA-----------------
 
+interface CallbackRequest extends Request<{ appointmentId: string }> {}
+
+function convertMpesaDate(mpesaDate: number): Date {
+  const dateStr = mpesaDate.toString();
+  const year = parseInt(dateStr.substring(0, 4));
+  const month = parseInt(dateStr.substring(4, 6)) - 1;
+  const day = parseInt(dateStr.substring(6, 8));
+  const hour = parseInt(dateStr.substring(8, 10));
+  const minute = parseInt(dateStr.substring(10, 12));
+  const second = parseInt(dateStr.substring(12, 14));
+  return new Date(Date.UTC(year, month, day, hour, minute, second));
+}
+
 // Trigger M-Pesa STK Push
 export const initiateMpesaPaymentController = async (req: Request, res: Response) => {
   try {
@@ -54,7 +67,13 @@ export const initiateMpesaPaymentController = async (req: Request, res: Response
   }
 };
 
-export const mpesaCallbackController = async (req: Request, res: Response) => {
+export const mpesaCallbackController = async (req: CallbackRequest, res: Response) => {
+  const appointmentId = parseInt(req.params.appointmentId, 10);
+
+  if (isNaN(appointmentId)) {
+    return res.status(400).json({ message: "Invalid appointment ID" });
+  }
+
   try {
     console.log("🟡 M-PESA Callback Received");
     const body = req.body;
@@ -72,47 +91,19 @@ export const mpesaCallbackController = async (req: Request, res: Response) => {
 
     console.log("📦 Parsed Callback:", { resultCode, metadataItems });
 
-    // Get transaction details
     const transactionId = metadataItems.find(item => item.Name === "MpesaReceiptNumber")?.Value;
     const amount = metadataItems.find(item => item.Name === "Amount")?.Value;
-    const dateVal = metadataItems.find((item) => item.Name === "TransactionDate")?.Value;
-
-    function convertMpesaDate(mpesaDate: number): Date {
-      const dateStr = mpesaDate.toString(); // e.g. "20250803165048"
-      const year = parseInt(dateStr.substring(0, 4));
-      const month = parseInt(dateStr.substring(4, 6)) - 1; // months are 0-based in JS
-      const day = parseInt(dateStr.substring(6, 8));
-      const hour = parseInt(dateStr.substring(8, 10));
-      const minute = parseInt(dateStr.substring(10, 12));
-      const second = parseInt(dateStr.substring(12, 14));
-
-     return new Date(Date.UTC(year, month, day, hour, minute, second));
-    }
-
-    // Extract account reference (used to get appointmentId)
-    const accountRef = callback.AccountReference || "CareConnect-0"; // fallback
-    const appointmentIdStr = accountRef.split("-")[1];
-    const appointmentId = appointmentIdStr && /^\d+$/.test(appointmentIdStr) ? parseInt(appointmentIdStr) : NaN;
-
-    if (isNaN(appointmentId)) {
-      console.warn("⚠️ Invalid or missing appointment ID in AccountReference:", accountRef);
-      return res.status(400).json({ message: "Invalid AccountReference format" });
-    }
-
-    if (isNaN(appointmentId)) {
-      console.warn("⚠️ Could not parse appointmentId from AccountReference:", accountRef);
-      return res.status(400).json({ message: "Invalid AccountReference format" });
-    }
+    const dateVal = metadataItems.find(item => item.Name === "TransactionDate")?.Value;
 
     if (resultCode === 0) {
       if (!transactionId) {
         console.warn("⚠️ Missing MpesaReceiptNumber despite success");
         return res.status(400).json({ message: "Missing transaction ID in callback" });
       }
+
       console.log("✅ Payment Success Detected");
       console.log("💳 Transaction ID:", transactionId);
       console.log("💰 Amount:", amount);
-      console.log("🆔 AccountRef:", accountRef);
 
       await updatePaymentStatusService({
         appointmentId,

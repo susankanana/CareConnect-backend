@@ -31,13 +31,16 @@ app.route("/payment/mpesa/initiate").post(
 );
 
 // M-Pesa Callback (no auth)
-app.route("/payment/mpesa/callback").post(
+app.route("/payment/mpesa/callback/:appointmentId").post(
   async (req, res, next) => {
     try {
-      const body = req.body;
+      const appointmentId = parseInt(req.params.appointmentId, 10);
 
-      // ✅ Log full M-PESA callback body
-      console.log("📩 Callback Body:", JSON.stringify(body, null, 2));
+      console.log("📩 Callback AppointmentID:", appointmentId);
+      console.log("📩 Callback Body:", JSON.stringify(req.body, null, 2));
+
+      // Attach appointmentId to request so controller can access it
+      (req as any).appointmentId = appointmentId;
 
       await mpesaCallbackController(req, res);
     } catch (error: any) {

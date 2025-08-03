@@ -14,7 +14,7 @@ const shortCode = process.env.MPESA_SHORTCODE!; // e.g., 174379 (sandbox)
 console.log(`Shortcode length: ${shortCode.length}`);
 const passkey = process.env.MPESA_PASSKEY!;
 console.log(`Passkey length: ${passkey.length}`);
-const callbackUrl = `${process.env.SERVER_URL}/payment/mpesa/callback`;
+
 
 const getMpesaAccessToken = async () => {
   const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
@@ -27,6 +27,7 @@ const getMpesaAccessToken = async () => {
 };
 
 export const initiateMpesaStkPushService = async (appointmentId: number, phone: string) => {
+  const callbackUrl = `${process.env.SERVER_URL}/payment/mpesa/callback/${appointmentId}`;
 
   console.log("🛠 initiateMpesaStkPushService CALLED");
 
