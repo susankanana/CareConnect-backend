@@ -5,7 +5,8 @@ import {
   getPaymentByIdController,
   getPaymentsByAppointmentController,
   initiateMpesaPaymentController,
-  mpesaCallbackController
+  mpesaCallbackController,
+  checkPaymentStatusByAppointmentIdController
 } from "./payment.controller";
 
 import {
@@ -108,6 +109,18 @@ app.route("/payment/mpesa/callback/:appointmentId").post(
     async (req, res, next) => {
       try {
         await getPaymentsByAppointmentController(req, res);
+      } catch (error: any) {
+        next(error);
+      }
+    }
+  );
+
+  // Check payment status by appointment ID
+  app.route("/payments/status/:appointmentId").get(
+    userRoleAuth,
+    async (req, res, next) => {
+      try {
+        await checkPaymentStatusByAppointmentIdController(req, res);
       } catch (error: any) {
         next(error);
       }

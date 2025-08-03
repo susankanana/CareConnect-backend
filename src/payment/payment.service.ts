@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import Stripe from "stripe";
 import db from "../drizzle/db";
 import { PaymentsTable, TIPayment, AppointmentsTable } from "../drizzle/schema";
@@ -183,4 +183,23 @@ export const updatePaymentStatusService = async ({
     })
     .where(eq(PaymentsTable.appointmentId, appointmentId));
     console.log("🔧 Update result:", result); 
+};
+
+export const checkPaymentStatusByAppointmentIdService = async (appointmentId: number): Promise<boolean> => {
+  const payment = await db.query.PaymentsTable.findFirst({
+    where: and(
+      eq(PaymentsTable.appointmentId, appointmentId),
+      eq(PaymentsTable.paymentStatus, "Paid")
+    ),
+  });
+  
+  const isPaid = !!payment; // `!!payment` returns `true` if a payment was found, `false` otherwise
+  
+  if (!isPaid) {
+    console.log(`No paid payment record found for appointment ID: ${appointmentId}`);
+    return false;
+  }
+  
+  console.log(`Paid payment record found for appointment ID: ${appointmentId}`);
+  return true;
 };

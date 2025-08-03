@@ -6,7 +6,8 @@ import {
   getAllPaymentsService,
   getPaymentByIdService,
   getPaymentsByAppointmentService,
-  updatePaymentStatusService
+  updatePaymentStatusService,
+  checkPaymentStatusByAppointmentIdService
 } from "./payment.service";
 import { getAppointmentByIdService } from "../appointment/appointment.service";
 import { initiateMpesaStkPushService } from "./payment.service";
@@ -256,6 +257,22 @@ export const getPaymentsByAppointmentController = async (req: Request, res: Resp
 
     const payments = await getPaymentsByAppointmentService(appointmentId);
     return res.status(200).json({ data: payments });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// Check Payment Status by Appointment ID
+export const checkPaymentStatusByAppointmentIdController = async (req: Request, res: Response) => {
+  try {
+    const appointmentId = parseInt(req.params.appointmentId);
+    if (isNaN(appointmentId)) {
+      return res.status(400).json({ message: "Invalid appointment ID" });
+    }
+
+    const isPaid = await checkPaymentStatusByAppointmentIdService(appointmentId);
+    
+    return res.status(200).json({ data: isPaid });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
