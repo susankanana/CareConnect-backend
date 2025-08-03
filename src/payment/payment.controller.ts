@@ -30,9 +30,6 @@ function convertMpesaDate(mpesaDate: number): Date {
 export const initiateMpesaPaymentController = async (req: Request, res: Response) => {
   try {
     const { appointmentId, phone } = req.body;
-    console.log("🟡 M-PESA Initiation Requested");
-    console.log("📌 Request Body:", { appointmentId, phone });
-
     if (!appointmentId || !phone) {
       return res.status(400).json({ message: "appointmentId and phone are required" });
     }
@@ -48,19 +45,19 @@ export const initiateMpesaPaymentController = async (req: Request, res: Response
     });
 
     const result = await initiateMpesaStkPushService(appointmentId, phone);
-    console.log("✅ STK Push Initiated Successfully:", result);
+    console.log("STK Push Initiated Successfully:", result);
 
     return res.status(200).json({ message: "STK Push initiated", data: result });
   } catch (error: any) {
     console.error("M-PESA STK Push Error:");
     if (error.response) {
       // Axios error with response from M-Pesa
-      console.error("🔴 Error Status:", error.response.status);
-      console.error("🔴 Error Data:", error.response.data);
-      console.error("🔴 Error Headers:", error.response.headers);
+      console.error("Error Status:", error.response.status);
+      console.error("Error Data:", error.response.data);
+      console.error("Error Headers:", error.response.headers);
     } else {
       // Any other kind of error (network, logic, etc.)
-      console.error("🔴 Error Message:", error.message);
+      console.error("Error Message:", error.message);
     }
 
     return res.status(500).json({ error: error.message });
@@ -75,21 +72,21 @@ export const mpesaCallbackController = async (req: CallbackRequest, res: Respons
   }
 
   try {
-    console.log("🟡 M-PESA Callback Received");
+    console.log("M-PESA Callback Received");
     const body = req.body;
-    console.log("📩 Callback Raw Body:", JSON.stringify(body, null, 2));
+    console.log("Callback Raw Body:", JSON.stringify(body, null, 2));
 
     const callback = body?.Body?.stkCallback;
 
     if (!callback) {
-      console.warn("⚠️ Invalid callback format: 'stkCallback' not found");
+      console.warn("Invalid callback format: 'stkCallback' not found");
       return res.status(400).json({ message: "Invalid callback format" });
     }
 
     const resultCode = callback?.ResultCode;
     const metadataItems = callback?.CallbackMetadata?.Item as { Name: string; Value: any }[] || [];
 
-    console.log("📦 Parsed Callback:", { resultCode, metadataItems });
+    console.log("Parsed Callback:", { resultCode, metadataItems });
 
     const transactionId = metadataItems.find(item => item.Name === "MpesaReceiptNumber")?.Value;
     const amount = metadataItems.find(item => item.Name === "Amount")?.Value;
@@ -97,13 +94,12 @@ export const mpesaCallbackController = async (req: CallbackRequest, res: Respons
 
     if (resultCode === 0) {
       if (!transactionId) {
-        console.warn("⚠️ Missing MpesaReceiptNumber despite success");
         return res.status(400).json({ message: "Missing transaction ID in callback" });
       }
 
-      console.log("✅ Payment Success Detected");
-      console.log("💳 Transaction ID:", transactionId);
-      console.log("💰 Amount:", amount);
+      console.log("Payment Success Detected");
+      console.log("Transaction ID:", transactionId);
+      console.log("Amount:", amount);
 
       await updatePaymentStatusService({
         appointmentId,
@@ -113,10 +109,10 @@ export const mpesaCallbackController = async (req: CallbackRequest, res: Respons
         paymentDate: convertMpesaDate(dateVal),
       });
 
-      console.log("📝 Payment status updated in DB (Success)");
+      console.log("Payment status updated in DB (Success)");
     } else {
-      console.warn("❌ M-PESA payment failed or cancelled");
-      console.warn("🔎 ResultCode:", resultCode);
+      console.warn("M-PESA payment failed or cancelled");
+      console.warn("ResultCode:", resultCode);
 
       await updatePaymentStatusService({
         appointmentId,
@@ -124,12 +120,12 @@ export const mpesaCallbackController = async (req: CallbackRequest, res: Respons
         paymentDate: new Date(),
       });
 
-      console.log("📝 Payment status updated in DB (Failure)");
+      console.log("Payment status updated in DB (Failure)");
     }
 
     return res.status(200).json({ message: "Callback received" });
   } catch (error: any) {
-    console.error("❗ M-PESA Callback Error:", error.message);
+    console.error("M-PESA Callback Error:", error.message);
     return res.status(500).json({ error: error.message });
   }
 };

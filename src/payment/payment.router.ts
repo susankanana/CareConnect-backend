@@ -36,8 +36,8 @@ app.route("/payment/mpesa/callback/:appointmentId").post(
     try {
       const appointmentId = parseInt(req.params.appointmentId, 10);
 
-      console.log("📩 Callback AppointmentID:", appointmentId);
-      console.log("📩 Callback Body:", JSON.stringify(req.body, null, 2));
+      console.log("Callback AppointmentID:", appointmentId);
+      console.log("Callback Body:", JSON.stringify(req.body, null, 2));
 
       // Attach appointmentId to request so controller can access it
       (req as any).appointmentId = appointmentId;

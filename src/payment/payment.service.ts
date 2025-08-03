@@ -41,7 +41,7 @@ export const initiateMpesaStkPushService = async (appointmentId: number, phone: 
     if (!amount || amount <= 0) throw new Error("Invalid amount");
 
     const token = await getMpesaAccessToken();
-    console.log("🔐 Got Access Token");
+    console.log("Got Access Token");
 
     const pad = (n: number) => n.toString().padStart(2, "0");
     const now = new Date();
@@ -61,7 +61,7 @@ export const initiateMpesaStkPushService = async (appointmentId: number, phone: 
       AccountReference: `CareConnect-${appointmentId}`,
       TransactionDesc: "CareConnect Appointment Payment",
     };
-    console.log("🚀 STK Payload:", payload);
+    console.log("STK Payload:", payload);
     const response = await axios.post(
       `${mpesaBaseUrl}/mpesa/stkpush/v1/processrequest`,
       payload,
@@ -73,10 +73,10 @@ export const initiateMpesaStkPushService = async (appointmentId: number, phone: 
       }
     );
   
-    console.log("✅ STK Push Response:", response.data);
+    console.log("STK Push Response:", response.data);
     return response.data;
   } catch (error: any) {
-      console.error("🔥 STK Push Failed:", error?.response?.data || error.message);
+      console.error("STK Push Failed:", error?.response?.data || error.message);
     throw error;
   }
 };
