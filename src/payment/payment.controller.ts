@@ -75,12 +75,29 @@ export const mpesaCallbackController = async (req: Request, res: Response) => {
     // Get transaction details
     const transactionId = metadataItems.find(item => item.Name === "MpesaReceiptNumber")?.Value;
     const amount = metadataItems.find(item => item.Name === "Amount")?.Value;
+    const dateVal = metadataItems.find((item) => item.Name === "TransactionDate")?.Value;
+
+    function convertMpesaDate(mpesaDate: number): Date {
+      const dateStr = mpesaDate.toString(); // e.g. "20250803165048"
+      const year = parseInt(dateStr.substring(0, 4));
+      const month = parseInt(dateStr.substring(4, 6)) - 1; // months are 0-based in JS
+      const day = parseInt(dateStr.substring(6, 8));
+      const hour = parseInt(dateStr.substring(8, 10));
+      const minute = parseInt(dateStr.substring(10, 12));
+      const second = parseInt(dateStr.substring(12, 14));
+
+     return new Date(Date.UTC(year, month, day, hour, minute, second));
+    }
 
     // Extract account reference (used to get appointmentId)
-    const accountReferenceItem = metadataItems.find(item => item.Name === "AccountReference");
-    const accountRef = accountReferenceItem?.Value || callback?.MerchantRequestID || "";
+    const accountRef = callback.AccountReference || "CareConnect-0"; // fallback
+    const appointmentIdStr = accountRef.split("-")[1];
+    const appointmentId = appointmentIdStr && /^\d+$/.test(appointmentIdStr) ? parseInt(appointmentIdStr) : NaN;
 
-    const appointmentId = parseInt(accountRef.split("-")[1]);
+    if (isNaN(appointmentId)) {
+      console.warn("⚠️ Invalid or missing appointment ID in AccountReference:", accountRef);
+      return res.status(400).json({ message: "Invalid AccountReference format" });
+    }
 
     if (isNaN(appointmentId)) {
       console.warn("⚠️ Could not parse appointmentId from AccountReference:", accountRef);
@@ -88,6 +105,10 @@ export const mpesaCallbackController = async (req: Request, res: Response) => {
     }
 
     if (resultCode === 0) {
+      if (!transactionId) {
+        console.warn("⚠️ Missing MpesaReceiptNumber despite success");
+        return res.status(400).json({ message: "Missing transaction ID in callback" });
+      }
       console.log("✅ Payment Success Detected");
       console.log("💳 Transaction ID:", transactionId);
       console.log("💰 Amount:", amount);
@@ -98,7 +119,7 @@ export const mpesaCallbackController = async (req: Request, res: Response) => {
         transactionId,
         amount: Number(amount).toFixed(2),
         paymentStatus: "Paid",
-        paymentDate: new Date(),
+        paymentDate: convertMpesaDate(dateVal),
       });
 
       console.log("📝 Payment status updated in DB (Success)");
