@@ -166,14 +166,14 @@ export const updatePaymentStatusService = async ({
   paymentStatus: "Paid" | "Failed";
   paymentDate: Date;
 }) => {
-  console.log("🔄 Trying to update payment with:", {
+  console.log("Trying to update payment with:", {
     appointmentId,
     transactionId,
     amount,
     paymentStatus,
     paymentDate,
   });
-  console.log("👉 Updating payment for appointmentId:", appointmentId);
+  console.log("Updating payment for appointmentId:", appointmentId);
   const result = await db.update(PaymentsTable)
     .set({
       transactionId,
@@ -182,24 +182,30 @@ export const updatePaymentStatusService = async ({
       paymentDate,
     })
     .where(eq(PaymentsTable.appointmentId, appointmentId));
-    console.log("🔧 Update result:", result); 
+    console.log("Update result:", result); 
 };
 
-export const checkPaymentStatusByAppointmentIdService = async (appointmentId: number): Promise<boolean> => {
+export const checkPaymentStatusByAppointmentIdService = async (
+  appointmentId: number
+): Promise<"Paid" | "Pending" | "Failed"> => {
   const payment = await db.query.PaymentsTable.findFirst({
-    where: and(
-      eq(PaymentsTable.appointmentId, appointmentId),
-      eq(PaymentsTable.paymentStatus, "Paid")
-    ),
+    where: eq(PaymentsTable.appointmentId, appointmentId),
   });
-  
-  const isPaid = !!payment; // `!!payment` returns `true` if a payment was found, `false` otherwise
-  
-  if (!isPaid) {
-    console.log(`No paid payment record found for appointment ID: ${appointmentId}`);
-    return false;
+
+  if (!payment) {
+    console.log(`No payment record found for appointment ID: ${appointmentId}`);
+    return "Pending"; // No payment found = not initiated yet
   }
-  
-  console.log(`Paid payment record found for appointment ID: ${appointmentId}`);
-  return true;
+
+  const status = payment.paymentStatus?.toLowerCase();
+
+  switch (status) {
+    case "paid":
+      return "Paid";
+    case "failed":
+      return "Failed";
+    case "pending":
+    default:
+      return "Pending";
+  }
 };

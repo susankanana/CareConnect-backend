@@ -270,9 +270,9 @@ export const checkPaymentStatusByAppointmentIdController = async (req: Request, 
       return res.status(400).json({ message: "Invalid appointment ID" });
     }
 
-    const isPaid = await checkPaymentStatusByAppointmentIdService(appointmentId);
-    
-    return res.status(200).json({ status: isPaid ? "Paid" : "Unpaid" });
+    const paymentStatus = await checkPaymentStatusByAppointmentIdService(appointmentId);
+
+    return res.status(200).json({ status: paymentStatus });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
