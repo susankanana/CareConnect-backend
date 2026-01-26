@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   createAppointmentService,
   getAppointmentsService,
@@ -10,7 +10,7 @@ import {
   updateAppointmentService,
   updateAppointmentStatusService,
   deleteAppointmentService,
-} from "./appointment.service";
+} from './appointment.service';
 
 // Create appointment
 export const createAppointmentController = async (req: Request, res: Response) => {
@@ -18,9 +18,9 @@ export const createAppointmentController = async (req: Request, res: Response) =
     const appointment = req.body;
     const created = await createAppointmentService(appointment);
     if (!created) {
-      return res.status(400).json({ message: "Appointment could not be created" });
+      return res.status(400).json({ message: 'Appointment could not be created' });
     }
-    return res.status(201).json({ data: created, message: "Appointment created successfully" });
+    return res.status(201).json({ data: created, message: 'Appointment created successfully' });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
@@ -40,10 +40,10 @@ export const getAppointmentsController = async (req: Request, res: Response) => 
 export const getAppointmentByIdController = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+    if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const appointment = await getAppointmentByIdService(id);
-    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+    if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
     return res.status(200).json({ data: appointment });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -54,7 +54,7 @@ export const getAppointmentByIdController = async (req: Request, res: Response) 
 export const getAppointmentsByUserIdController = async (req: Request, res: Response) => {
   try {
     const userId = parseInt(req.params.userId);
-    if (isNaN(userId)) return res.status(400).json({ message: "Invalid User ID" });
+    if (isNaN(userId)) return res.status(400).json({ message: 'Invalid User ID' });
 
     const appointments = await getAppointmentsByUserIdService(userId);
     return res.status(200).json({ data: appointments });
@@ -67,7 +67,7 @@ export const getAppointmentsByUserIdController = async (req: Request, res: Respo
 export const getAppointmentsByDoctorIdController = async (req: Request, res: Response) => {
   try {
     const doctorId = parseInt(req.params.doctorId);
-    if (isNaN(doctorId)) return res.status(400).json({ message: "Invalid Doctor ID" });
+    if (isNaN(doctorId)) return res.status(400).json({ message: 'Invalid Doctor ID' });
 
     const appointments = await getAppointmentsByDoctorIdService(doctorId);
     return res.status(200).json({ data: appointments });
@@ -101,7 +101,7 @@ export const getDetailedAppointmentsController = async (req: Request, res: Respo
 export const updateAppointmentController = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+    if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const appointment = req.body;
     const updated = await updateAppointmentService(id, appointment);
@@ -117,59 +117,57 @@ export const updateAppointmentStatusController = async (req: Request, res: Respo
     const id = parseInt(req.params.id);
     const { status } = req.body;
 
-    if (!["Pending", "Confirmed", "Cancelled"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status value" });
+    if (!['Pending', 'Confirmed', 'Cancelled'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
     }
 
     // Check if appointment exists first
     const appointment = await getAppointmentByIdService(id);
     if (!appointment) {
-      return res.status(404).json({ message: "Appointment not found" });
+      return res.status(404).json({ message: 'Appointment not found' });
     }
 
     if (!req.user) {
-       return res.status(401).json({ message: "Unauthorized" });
-     }
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     const role = req.user.role; //defined in global.types.ts
     const userId = req.user.id; //defined in global.types.ts
 
     // Role-based logic
-    if (status === "Confirmed" && role !== "doctor" && role !== "admin") {
+    if (status === 'Confirmed' && role !== 'doctor' && role !== 'admin') {
       return res.status(403).json({
-        message: "Only doctors or admins can confirm appointments",
+        message: 'Only doctors or admins can confirm appointments',
       });
     }
 
-    if (status === "Cancelled") {
+    if (status === 'Cancelled') {
       // Only patient or admin can cancel
       const isPatient = appointment.userId === userId;
-      if (!isPatient && role !== "admin") {
+      if (!isPatient && role !== 'admin') {
         return res.status(403).json({
-          message: "Only the patient or an admin can cancel this appointment",
+          message: 'Only the patient or an admin can cancel this appointment',
         });
       }
     }
 
     const updated = await updateAppointmentStatusService(id, status as any);
-    return res.status(200).json({ message: "Status updated", data: updated });
-
+    return res.status(200).json({ message: 'Status updated', data: updated });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
 };
 
-
 // Delete appointment
 export const deleteAppointmentController = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+    if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const deleted = await deleteAppointmentService(id);
-    if (!deleted) return res.status(404).json({ message: "Appointment not found" });
+    if (!deleted) return res.status(404).json({ message: 'Appointment not found' });
 
-    return res.status(204).json({ message: "Appointment deleted successfully" });
+    return res.status(204).json({ message: 'Appointment deleted successfully' });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   createPrescriptionService,
   getPrescriptionsService,
@@ -7,7 +7,7 @@ import {
   getPrescriptionsByDoctorIdService,
   updatePrescriptionService,
   deletePrescriptionService,
-} from "./prescription.service";
+} from './prescription.service';
 
 // Create prescription controller
 export const createPrescriptionController = async (req: Request, res: Response) => {
@@ -15,9 +15,9 @@ export const createPrescriptionController = async (req: Request, res: Response) 
     const prescription = req.body;
     const created = await createPrescriptionService(prescription);
     if (!created) {
-      return res.status(400).json({ message: "Prescription could not be created" });
+      return res.status(400).json({ message: 'Prescription could not be created' });
     }
-    return res.status(201).json({ data: created, message: "Prescription created successfully" });
+    return res.status(201).json({ data: created, message: 'Prescription created successfully' });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
@@ -28,7 +28,7 @@ export const getPrescriptionsController = async (_req: Request, res: Response) =
   try {
     const prescriptions = await getPrescriptionsService();
     if (!prescriptions || prescriptions.length === 0) {
-      return res.status(404).json({ message: "No prescriptions found" });
+      return res.status(404).json({ message: 'No prescriptions found' });
     }
     return res.status(200).json({ data: prescriptions });
   } catch (error: any) {
@@ -40,10 +40,10 @@ export const getPrescriptionsController = async (_req: Request, res: Response) =
 export const getPrescriptionByIdController = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+    if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const prescription = await getPrescriptionByIdService(id);
-    if (!prescription) return res.status(404).json({ message: "Prescription not found" });
+    if (!prescription) return res.status(404).json({ message: 'Prescription not found' });
 
     return res.status(200).json({ data: prescription });
   } catch (error: any) {
@@ -55,7 +55,7 @@ export const getPrescriptionByIdController = async (req: Request, res: Response)
 export const getPrescriptionsByPatientIdController = async (req: Request, res: Response) => {
   try {
     const patientId = parseInt(req.params.patientId);
-    if (isNaN(patientId)) return res.status(400).json({ message: "Invalid patient ID" });
+    if (isNaN(patientId)) return res.status(400).json({ message: 'Invalid patient ID' });
 
     const prescriptions = await getPrescriptionsByPatientIdService(patientId);
     return res.status(200).json({ data: prescriptions });
@@ -68,7 +68,7 @@ export const getPrescriptionsByPatientIdController = async (req: Request, res: R
 export const getPrescriptionsByDoctorIdController = async (req: Request, res: Response) => {
   try {
     const doctorId = parseInt(req.params.doctorId);
-    if (isNaN(doctorId)) return res.status(400).json({ message: "Invalid doctor ID" });
+    if (isNaN(doctorId)) return res.status(400).json({ message: 'Invalid doctor ID' });
 
     const prescriptions = await getPrescriptionsByDoctorIdService(doctorId);
     return res.status(200).json({ data: prescriptions });
@@ -81,10 +81,10 @@ export const getPrescriptionsByDoctorIdController = async (req: Request, res: Re
 export const updatePrescriptionController = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+    if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const existing = await getPrescriptionByIdService(id);
-    if (!existing) return res.status(404).json({ message: "Prescription not found" });
+    if (!existing) return res.status(404).json({ message: 'Prescription not found' });
 
     const updated = await updatePrescriptionService(id, req.body);
     return res.status(200).json({ message: updated });
@@ -97,13 +97,13 @@ export const updatePrescriptionController = async (req: Request, res: Response) 
 export const deletePrescriptionController = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+    if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const existing = await getPrescriptionByIdService(id);
-    if (!existing) return res.status(404).json({ message: "Prescription not found" });
+    if (!existing) return res.status(404).json({ message: 'Prescription not found' });
 
     const deleted = await deletePrescriptionService(id);
-    return res.status(204).json({ message: "Prescription deleted successfully", data: deleted });
+    return res.status(204).json({ message: 'Prescription deleted successfully', data: deleted });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }

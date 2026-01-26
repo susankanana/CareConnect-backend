@@ -1,13 +1,10 @@
-import { eq } from "drizzle-orm";
-import db from "../drizzle/db";
-import { ComplaintsTable, TIComplaint } from "../drizzle/schema";
+import { eq } from 'drizzle-orm';
+import db from '../drizzle/db';
+import { ComplaintsTable, TIComplaint } from '../drizzle/schema';
 
 // Create a new complaint
 export const createComplaintService = async (complaint: TIComplaint) => {
-  const [created] = await db
-    .insert(ComplaintsTable)
-    .values(complaint)
-    .returning();
+  const [created] = await db.insert(ComplaintsTable).values(complaint).returning();
   return created;
 };
 
@@ -42,22 +39,19 @@ export const getComplaintsByStatusService = async (status: string) => {
 };
 
 // Update a complaint
-export const updateComplaintService = async (
-  id: number,
-  complaint: Partial<TIComplaint>
-) => {
+export const updateComplaintService = async (id: number, complaint: Partial<TIComplaint>) => {
   await db
     .update(ComplaintsTable)
     .set(complaint)
     .where(eq(ComplaintsTable.complaintId, id))
     .returning();
-  return "Complaint updated successfully";
+  return 'Complaint updated successfully';
 };
 
 // Update complaint status
 export const updateComplaintStatusService = async (
   complaintId: number,
-  status: "Open" | "In Progress" | "Resolved" | "Closed"
+  status: 'Open' | 'In Progress' | 'Resolved' | 'Closed'
 ) => {
   const [updated] = await db
     .update(ComplaintsTable)
@@ -66,7 +60,7 @@ export const updateComplaintStatusService = async (
     .returning();
 
   if (!updated) {
-    throw new Error("Complaint not found or update failed.");
+    throw new Error('Complaint not found or update failed.');
   }
 
   return updated;

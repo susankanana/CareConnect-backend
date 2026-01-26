@@ -1,14 +1,14 @@
-import { sql } from "drizzle-orm";
-import { eq } from "drizzle-orm";
-import db from "../drizzle/db";
-import { TIDoctor, DoctorsTable, TSDoctor, UsersTable} from "../drizzle/schema";
+import { sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+import db from '../drizzle/db';
+import { TIDoctor, DoctorsTable, TSDoctor, UsersTable } from '../drizzle/schema';
 
 // get all doctors
 export const getDoctorsService = async () => {
   const doctors = await db
     .select({
       user: UsersTable,
-      doctor: DoctorsTable
+      doctor: DoctorsTable,
     })
     .from(DoctorsTable)
     .innerJoin(UsersTable, eq(UsersTable.userId, DoctorsTable.doctorId));
@@ -21,7 +21,7 @@ export const getDoctorByIdService = async (id: number) => {
   const result = await db
     .select({
       user: UsersTable,
-      doctor: DoctorsTable
+      doctor: DoctorsTable,
     })
     .from(DoctorsTable)
     .innerJoin(UsersTable, eq(UsersTable.userId, DoctorsTable.doctorId))
@@ -35,7 +35,7 @@ export const getDoctorBySpecializationService = async (specialization: string) =
   const results = await db
     .select({
       user: UsersTable,
-      doctor: DoctorsTable
+      doctor: DoctorsTable,
     })
     .from(DoctorsTable)
     .innerJoin(UsersTable, eq(UsersTable.userId, DoctorsTable.doctorId))

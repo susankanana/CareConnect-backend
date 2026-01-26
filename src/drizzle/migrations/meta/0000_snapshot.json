@@ -73,12 +73,8 @@
           "name": "appointments_user_id_users_id_fk",
           "tableFrom": "appointments",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -86,12 +82,8 @@
           "name": "appointments_doctor_id_doctors_doctor_id_fk",
           "tableFrom": "appointments",
           "tableTo": "doctors",
-          "columnsFrom": [
-            "doctor_id"
-          ],
-          "columnsTo": [
-            "doctor_id"
-          ],
+          "columnsFrom": ["doctor_id"],
+          "columnsTo": ["doctor_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -165,12 +157,8 @@
           "name": "complaints_user_id_users_id_fk",
           "tableFrom": "complaints",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -178,12 +166,8 @@
           "name": "complaints_related_appointment_id_appointments_appointment_id_fk",
           "tableFrom": "complaints",
           "tableTo": "appointments",
-          "columnsFrom": [
-            "related_appointment_id"
-          ],
-          "columnsTo": [
-            "appointment_id"
-          ],
+          "columnsFrom": ["related_appointment_id"],
+          "columnsTo": ["appointment_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -237,12 +221,8 @@
           "name": "doctors_doctor_id_users_id_fk",
           "tableFrom": "doctors",
           "tableTo": "users",
-          "columnsFrom": [
-            "doctor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["doctor_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -314,12 +294,8 @@
           "name": "payments_appointment_id_appointments_appointment_id_fk",
           "tableFrom": "payments",
           "tableTo": "appointments",
-          "columnsFrom": [
-            "appointment_id"
-          ],
-          "columnsTo": [
-            "appointment_id"
-          ],
+          "columnsFrom": ["appointment_id"],
+          "columnsTo": ["appointment_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -385,12 +361,8 @@
           "name": "prescriptions_appointment_id_appointments_appointment_id_fk",
           "tableFrom": "prescriptions",
           "tableTo": "appointments",
-          "columnsFrom": [
-            "appointment_id"
-          ],
-          "columnsTo": [
-            "appointment_id"
-          ],
+          "columnsFrom": ["appointment_id"],
+          "columnsTo": ["appointment_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -398,12 +370,8 @@
           "name": "prescriptions_doctor_id_doctors_doctor_id_fk",
           "tableFrom": "prescriptions",
           "tableTo": "doctors",
-          "columnsFrom": [
-            "doctor_id"
-          ],
-          "columnsTo": [
-            "doctor_id"
-          ],
+          "columnsFrom": ["doctor_id"],
+          "columnsTo": ["doctor_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -411,12 +379,8 @@
           "name": "prescriptions_patient_id_users_id_fk",
           "tableFrom": "prescriptions",
           "tableTo": "users",
-          "columnsFrom": [
-            "patient_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["patient_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -523,9 +487,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -537,30 +499,17 @@
     "public.appointment_status": {
       "name": "appointment_status",
       "schema": "public",
-      "values": [
-        "Pending",
-        "Confirmed",
-        "Cancelled"
-      ]
+      "values": ["Pending", "Confirmed", "Cancelled"]
     },
     "public.complaint_status": {
       "name": "complaint_status",
       "schema": "public",
-      "values": [
-        "Open",
-        "In Progress",
-        "Resolved",
-        "Closed"
-      ]
+      "values": ["Open", "In Progress", "Resolved", "Closed"]
     },
     "public.role": {
       "name": "role",
       "schema": "public",
-      "values": [
-        "user",
-        "admin",
-        "doctor"
-      ]
+      "values": ["user", "admin", "doctor"]
     }
   },
   "schemas": {},

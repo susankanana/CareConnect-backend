@@ -17,7 +17,6 @@
 //     console.error("Error connecting to the database:", error)
 // })
 
-
 // const db = drizzle(client, { schema, logger: false })
 
 //export default db;
@@ -26,7 +25,7 @@ import { neon } from '@neondatabase/serverless'; // Import neon client from its 
 import { drizzle } from 'drizzle-orm/neon-http'; // Import drizzle specifically for neon-http
 import * as schema from './schema';
 
-export const client = neon(process.env.Database_URL!)
+export const client = neon(process.env.Database_URL!);
 
 const db = drizzle(client, { schema, logger: false });
 export default db;

@@ -1,12 +1,12 @@
-import { and, eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
-import db from "../drizzle/db";
-import { AppointmentsTable, TIAppointment, UsersTable, DoctorsTable  } from "../drizzle/schema";
+import { and, eq } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
+import db from '../drizzle/db';
+import { AppointmentsTable, TIAppointment, UsersTable, DoctorsTable } from '../drizzle/schema';
 
 // Helper to get day name from date (e.g. "Monday")
 function getDayName(dateStr: string): string {
   const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", { weekday: "long" });
+  return date.toLocaleDateString('en-US', { weekday: 'long' });
 }
 
 // Create an appointment
@@ -19,7 +19,7 @@ export const createAppointmentService = async (appointment: TIAppointment) => {
   });
 
   if (!doctor) {
-    throw new Error("Doctor not found");
+    throw new Error('Doctor not found');
   }
 
   const bookingDay = getDayName(appointmentDate); // e.g. "Tuesday"
@@ -31,7 +31,7 @@ export const createAppointmentService = async (appointment: TIAppointment) => {
 
   if (!isAvailable) {
     throw new Error(
-      `Doctor is not available on ${bookingDay}. Available days: ${availableDays.join(", ")}`
+      `Doctor is not available on ${bookingDay}. Available days: ${availableDays.join(', ')}`
     );
   }
 
@@ -41,25 +41,24 @@ export const createAppointmentService = async (appointment: TIAppointment) => {
       eq(AppointmentsTable.doctorId, doctorId),
       eq(AppointmentsTable.appointmentDate, appointmentDate),
       eq(AppointmentsTable.timeSlot, timeSlot)
-    )
+    ),
   });
 
   if (existing) {
-    throw new Error("This time slot is already booked for the selected doctor.");
+    throw new Error('This time slot is already booked for the selected doctor.');
   }
 
   // Add default consultation fee & insert
-  const consultationFee = "6500.00";
+  const consultationFee = '6500.00';
 
   const appointmentWithFee = {
     ...appointment,
-    totalAmount: consultationFee
+    totalAmount: consultationFee,
   };
 
   const [created] = await db.insert(AppointmentsTable).values(appointmentWithFee).returning();
   return created;
 };
-
 
 // Get all appointments
 export const getAppointmentsService = async () => {
@@ -77,7 +76,7 @@ export const getAppointmentByIdService = async (id: number) => {
 
 // Get appointments by User ID (Patient)
 export const getAppointmentsByUserIdService = async (userId: number) => {
-  const doctorUser = alias(UsersTable, "doctorUser"); //alias is used to rename UsersTable to doctorUser to avoid conflict while joining users table for the second time to access doctors
+  const doctorUser = alias(UsersTable, 'doctorUser'); //alias is used to rename UsersTable to doctorUser to avoid conflict while joining users table for the second time to access doctors
   const result = await db
     .select({
       appointmentId: AppointmentsTable.appointmentId,
@@ -90,14 +89,14 @@ export const getAppointmentsByUserIdService = async (userId: number) => {
         name: UsersTable.firstName,
         lastName: UsersTable.lastName,
         email: UsersTable.email,
-        contactPhone: UsersTable.contactPhone
+        contactPhone: UsersTable.contactPhone,
       },
       doctor: {
         id: DoctorsTable.doctorId,
         name: doctorUser.firstName,
         lastName: doctorUser.lastName,
-        specialization: DoctorsTable.specialization
-      }
+        specialization: DoctorsTable.specialization,
+      },
     })
     .from(AppointmentsTable)
     .leftJoin(UsersTable, eq(AppointmentsTable.userId, UsersTable.userId))
@@ -110,7 +109,7 @@ export const getAppointmentsByUserIdService = async (userId: number) => {
 
 // Get detailed appointments by Doctor ID
 export const getAppointmentsByDoctorIdService = async (doctorId: number) => {
-  const doctorUser = alias(UsersTable, "doctorUser");
+  const doctorUser = alias(UsersTable, 'doctorUser');
 
   const result = await db
     .select({
@@ -124,14 +123,14 @@ export const getAppointmentsByDoctorIdService = async (doctorId: number) => {
         name: UsersTable.firstName,
         lastName: UsersTable.lastName,
         email: UsersTable.email,
-        contactPhone: UsersTable.contactPhone
+        contactPhone: UsersTable.contactPhone,
       },
       doctor: {
         id: DoctorsTable.doctorId,
         name: doctorUser.firstName,
         lastName: doctorUser.lastName,
-        specialization: DoctorsTable.specialization
-      }
+        specialization: DoctorsTable.specialization,
+      },
     })
     .from(AppointmentsTable)
     .leftJoin(UsersTable, eq(AppointmentsTable.userId, UsersTable.userId))
@@ -141,7 +140,6 @@ export const getAppointmentsByDoctorIdService = async (doctorId: number) => {
 
   return result;
 };
-
 
 //Get appointments by status
 export const getAppointmentsByStatusService = async (status: string) => {
@@ -153,7 +151,7 @@ export const getAppointmentsByStatusService = async (status: string) => {
 
 //Get detailed appointment with doctor and patient details
 export const getDetailedAppointmentsService = async () => {
-  const doctorUser = alias(UsersTable, "doctorUser"); 
+  const doctorUser = alias(UsersTable, 'doctorUser');
   const result = await db
     .select({
       appointmentId: AppointmentsTable.appointmentId,
@@ -166,14 +164,14 @@ export const getDetailedAppointmentsService = async () => {
         name: UsersTable.firstName,
         lastName: UsersTable.lastName,
         email: UsersTable.email,
-        contactPhone: UsersTable.contactPhone
+        contactPhone: UsersTable.contactPhone,
       },
       doctor: {
         id: DoctorsTable.doctorId,
         name: doctorUser.firstName,
         lastName: doctorUser.lastName,
-        specialization: DoctorsTable.specialization
-      }
+        specialization: DoctorsTable.specialization,
+      },
     })
     .from(AppointmentsTable)
     .leftJoin(UsersTable, eq(AppointmentsTable.userId, UsersTable.userId))
@@ -184,7 +182,10 @@ export const getDetailedAppointmentsService = async () => {
 };
 
 //Update appointment status
-export const updateAppointmentStatusService = async (appointmentId: number, status: "Pending" | "Confirmed" | "Cancelled") => {
+export const updateAppointmentStatusService = async (
+  appointmentId: number,
+  status: 'Pending' | 'Confirmed' | 'Cancelled'
+) => {
   const [updated] = await db
     .update(AppointmentsTable)
     .set({ appointmentStatus: status })
@@ -196,12 +197,19 @@ export const updateAppointmentStatusService = async (appointmentId: number, stat
 
 // Update an appointment
 export const updateAppointmentService = async (id: number, appointment: TIAppointment) => {
-  await db.update(AppointmentsTable).set(appointment).where(eq(AppointmentsTable.appointmentId, id)).returning();
-  return "Appointment updated successfully";
+  await db
+    .update(AppointmentsTable)
+    .set(appointment)
+    .where(eq(AppointmentsTable.appointmentId, id))
+    .returning();
+  return 'Appointment updated successfully';
 };
 
 // Delete an appointment
 export const deleteAppointmentService = async (id: number) => {
-  const deleted = await db.delete(AppointmentsTable).where(eq(AppointmentsTable.appointmentId, id)).returning();
+  const deleted = await db
+    .delete(AppointmentsTable)
+    .where(eq(AppointmentsTable.appointmentId, id))
+    .returning();
   return deleted[0];
 };

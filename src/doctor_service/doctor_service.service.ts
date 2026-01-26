@@ -1,6 +1,6 @@
-import db from "../drizzle/db";
-import { DoctorServicesTable, ServicesTable, DoctorsTable} from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import db from '../drizzle/db';
+import { DoctorServicesTable, ServicesTable, DoctorsTable } from '../drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 export const assignServicesToDoctor = async (doctorId: number, serviceIds: number[]) => {
   // Remove any existing associations first (optional but common)

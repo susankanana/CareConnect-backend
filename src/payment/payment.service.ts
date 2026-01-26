@@ -1,13 +1,13 @@
-import { eq, and } from "drizzle-orm";
-import Stripe from "stripe";
-import db from "../drizzle/db";
-import { PaymentsTable, TIPayment, AppointmentsTable } from "../drizzle/schema";
-import "dotenv/config"
-import axios from "axios"; //used with mpesa
+import { eq, and } from 'drizzle-orm';
+import Stripe from 'stripe';
+import db from '../drizzle/db';
+import { PaymentsTable, TIPayment, AppointmentsTable } from '../drizzle/schema';
+import 'dotenv/config';
+import axios from 'axios'; //used with mpesa
 
 //----------------------------MPESA---------------------
 
-const mpesaBaseUrl = "https://sandbox.safaricom.co.ke";
+const mpesaBaseUrl = 'https://sandbox.safaricom.co.ke';
 const consumerKey = process.env.MPESA_CONSUMER_KEY!;
 const consumerSecret = process.env.MPESA_CONSUMER_SECRET!;
 const shortCode = process.env.MPESA_SHORTCODE!; // e.g., 174379 (sandbox)
@@ -15,9 +15,8 @@ console.log(`Shortcode length: ${shortCode.length}`);
 const passkey = process.env.MPESA_PASSKEY!;
 console.log(`Passkey length: ${passkey.length}`);
 
-
 const getMpesaAccessToken = async () => {
-  const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
+  const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
   const res = await axios.get(`${mpesaBaseUrl}/oauth/v1/generate?grant_type=client_credentials`, {
     headers: {
       Authorization: `Basic ${auth}`,
@@ -29,54 +28,50 @@ const getMpesaAccessToken = async () => {
 export const initiateMpesaStkPushService = async (appointmentId: number, phone: string) => {
   const callbackUrl = `${process.env.SERVER_URL}/payment/mpesa/callback/${appointmentId}`;
 
-  console.log("🛠 initiateMpesaStkPushService CALLED");
+  console.log('🛠 initiateMpesaStkPushService CALLED');
 
-  try{
+  try {
     const appointment = await db.query.AppointmentsTable.findFirst({
-    where: eq(AppointmentsTable.appointmentId, appointmentId),
+      where: eq(AppointmentsTable.appointmentId, appointmentId),
     });
 
-    if (!appointment) throw new Error("Appointment not found");
+    if (!appointment) throw new Error('Appointment not found');
     const amount = Number(appointment.totalAmount);
-    if (!amount || amount <= 0) throw new Error("Invalid amount");
+    if (!amount || amount <= 0) throw new Error('Invalid amount');
 
     const token = await getMpesaAccessToken();
-    console.log("Got Access Token");
+    console.log('Got Access Token');
 
-    const pad = (n: number) => n.toString().padStart(2, "0");
+    const pad = (n: number) => n.toString().padStart(2, '0');
     const now = new Date();
     const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-    const password = Buffer.from(`${shortCode}${passkey}${timestamp}`).toString("base64");
+    const password = Buffer.from(`${shortCode}${passkey}${timestamp}`).toString('base64');
 
     const payload = {
       BusinessShortCode: shortCode,
       Password: password,
       Timestamp: timestamp,
-      TransactionType: "CustomerPayBillOnline",
-      Amount: 1,  //should pass amount but I'll use 1sh for testing
+      TransactionType: 'CustomerPayBillOnline',
+      Amount: 1, //should pass amount but I'll use 1sh for testing
       PartyA: phone,
       PartyB: shortCode,
       PhoneNumber: phone,
       CallBackURL: callbackUrl,
       AccountReference: `CareConnect-${appointmentId}`,
-      TransactionDesc: "CareConnect Appointment Payment",
+      TransactionDesc: 'CareConnect Appointment Payment',
     };
-    console.log("STK Payload:", payload);
-    const response = await axios.post(
-      `${mpesaBaseUrl}/mpesa/stkpush/v1/processrequest`,
-      payload,
-      {
-        headers: {
+    console.log('STK Payload:', payload);
+    const response = await axios.post(`${mpesaBaseUrl}/mpesa/stkpush/v1/processrequest`, payload, {
+      headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        },
-      }
-    );
-  
-    console.log("STK Push Response:", response.data);
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('STK Push Response:', response.data);
     return response.data;
   } catch (error: any) {
-      console.error("STK Push Failed:", error?.response?.data || error.message);
+    console.error('STK Push Failed:', error?.response?.data || error.message);
     throw error;
   }
 };
@@ -93,28 +88,28 @@ export const createCheckoutSessionService = async (appointmentId: number) => {
     where: eq(AppointmentsTable.appointmentId, appointmentId),
   });
 
-  if (!appointment) throw new Error("Appointment not found");
+  if (!appointment) throw new Error('Appointment not found');
 
-  const amount =  Number(appointment.totalAmount);
-  if (!amount || amount <= 0) throw new Error("Invalid appointment amount");
+  const amount = Number(appointment.totalAmount);
+  if (!amount || amount <= 0) throw new Error('Invalid appointment amount');
 
   // Create session with correct amount
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
+    payment_method_types: ['card'],
     line_items: [
       {
         price_data: {
-          currency: "kes",
+          currency: 'kes',
           product_data: {
-            name: "Hospital Appointment",
-            images: ["https://images.pexels.com/photos/5207102/pexels-photo-5207102.jpeg"]
+            name: 'Hospital Appointment',
+            images: ['https://images.pexels.com/photos/5207102/pexels-photo-5207102.jpeg'],
           },
           unit_amount: Math.round(amount * 100),
         },
         quantity: 1,
       },
     ],
-    mode: "payment",
+    mode: 'payment',
     metadata: {
       appointmentId: appointmentId.toString(),
     },
@@ -163,18 +158,19 @@ export const updatePaymentStatusService = async ({
   appointmentId: number;
   transactionId?: string;
   amount?: string;
-  paymentStatus: "Paid" | "Failed";
+  paymentStatus: 'Paid' | 'Failed';
   paymentDate: Date;
 }) => {
-  console.log("Trying to update payment with:", {
+  console.log('Trying to update payment with:', {
     appointmentId,
     transactionId,
     amount,
     paymentStatus,
     paymentDate,
   });
-  console.log("Updating payment for appointmentId:", appointmentId);
-  const result = await db.update(PaymentsTable)
+  console.log('Updating payment for appointmentId:', appointmentId);
+  const result = await db
+    .update(PaymentsTable)
     .set({
       transactionId,
       amount,
@@ -182,30 +178,30 @@ export const updatePaymentStatusService = async ({
       paymentDate,
     })
     .where(eq(PaymentsTable.appointmentId, appointmentId));
-    console.log("Update result:", result); 
+  console.log('Update result:', result);
 };
 
 export const checkPaymentStatusByAppointmentIdService = async (
   appointmentId: number
-): Promise<"Paid" | "Pending" | "Failed"> => {
+): Promise<'Paid' | 'Pending' | 'Failed'> => {
   const payment = await db.query.PaymentsTable.findFirst({
     where: eq(PaymentsTable.appointmentId, appointmentId),
   });
 
   if (!payment) {
     console.log(`No payment record found for appointment ID: ${appointmentId}`);
-    return "Pending"; // No payment found = not initiated yet
+    return 'Pending'; // No payment found = not initiated yet
   }
 
   const status = payment.paymentStatus?.toLowerCase();
 
   switch (status) {
-    case "paid":
-      return "Paid";
-    case "failed":
-      return "Failed";
-    case "pending":
+    case 'paid':
+      return 'Paid';
+    case 'failed':
+      return 'Failed';
+    case 'pending':
     default:
-      return "Pending";
+      return 'Pending';
   }
 };

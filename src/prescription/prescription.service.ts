@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
-import db from "../drizzle/db";
-import { PrescriptionsTable, TIPrescription, AppointmentsTable } from "../drizzle/schema";
+import { eq } from 'drizzle-orm';
+import db from '../drizzle/db';
+import { PrescriptionsTable, TIPrescription, AppointmentsTable } from '../drizzle/schema';
 
 // Create a prescription
 export const createPrescriptionService = async (prescription: TIPrescription) => {
@@ -11,24 +11,24 @@ export const createPrescriptionService = async (prescription: TIPrescription) =>
 
   // Fetch current appointment total
   const appointment = await db.query.AppointmentsTable.findFirst({
-    where: eq(AppointmentsTable.appointmentId, appointmentId)
+    where: eq(AppointmentsTable.appointmentId, appointmentId),
   });
 
   if (!appointment) {
-    throw new Error("Related appointment not found.");
+    throw new Error('Related appointment not found.');
   }
 
-  const currentTotal = parseFloat(appointment.totalAmount || "0");
+  const currentTotal = parseFloat(appointment.totalAmount || '0');
   const newTotal = currentTotal + parseFloat(amount);
 
   // Update appointment with new total
-  await db.update(AppointmentsTable)
+  await db
+    .update(AppointmentsTable)
     .set({ totalAmount: newTotal.toFixed(2) })
     .where(eq(AppointmentsTable.appointmentId, appointmentId));
 
   return created;
 };
-
 
 // Get all prescriptions
 export const getPrescriptionsService = async () => {
@@ -64,15 +64,15 @@ export const getPrescriptionsByDoctorIdService = async (doctorId: number) => {
 export const updatePrescriptionService = async (id: number, data: TIPrescription) => {
   // Fetch the existing prescription to get old amount and appointmentId
   const existing = await db.query.PrescriptionsTable.findFirst({
-    where: eq(PrescriptionsTable.prescriptionId, id)
+    where: eq(PrescriptionsTable.prescriptionId, id),
   });
 
   if (!existing) {
-    throw new Error("Prescription not found.");
+    throw new Error('Prescription not found.');
   }
 
-  const oldAmount = parseFloat(existing.amount || "0");
-  const newAmount = parseFloat(data.amount || "0");
+  const oldAmount = parseFloat(existing.amount || '0');
+  const newAmount = parseFloat(data.amount || '0');
   const appointmentId = existing.appointmentId;
 
   // Update the prescription
@@ -84,25 +84,26 @@ export const updatePrescriptionService = async (id: number, data: TIPrescription
 
   // Fetch current appointment total
   const appointment = await db.query.AppointmentsTable.findFirst({
-    where: eq(AppointmentsTable.appointmentId, appointmentId)
+    where: eq(AppointmentsTable.appointmentId, appointmentId),
   });
 
   if (!appointment) {
-    throw new Error("Associated appointment not found.");
+    throw new Error('Associated appointment not found.');
   }
 
-  const currentTotal = parseFloat(appointment.totalAmount || "0");
+  const currentTotal = parseFloat(appointment.totalAmount || '0');
 
   // Adjust total with the difference
   const difference = newAmount - oldAmount;
   const updatedTotal = currentTotal + difference;
 
   // Update appointment totalAmount
-  await db.update(AppointmentsTable)
+  await db
+    .update(AppointmentsTable)
     .set({ totalAmount: updatedTotal.toFixed(2) })
     .where(eq(AppointmentsTable.appointmentId, appointmentId));
 
-  return "Prescription updated successfully";
+  return 'Prescription updated successfully';
 };
 
 // Delete prescription

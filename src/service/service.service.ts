@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
-import db from "../drizzle/db";
-import { ServicesTable, TIService } from "../drizzle/schema";
+import { eq } from 'drizzle-orm';
+import db from '../drizzle/db';
+import { ServicesTable, TIService } from '../drizzle/schema';
 
 // Create a new service
 export const createServiceService = async (service: TIService) => {

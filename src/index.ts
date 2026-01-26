@@ -17,8 +17,8 @@ const initializeApp = () => {
 
   // Stripe webhook must come before express.json()
   app.post(
-    "/payment/webhook",
-    express.raw({ type: "application/json" }),
+    '/payment/webhook',
+    express.raw({ type: 'application/json' }),
     async (req, res, next) => {
       try {
         await stripeWebhookController(req, res);
@@ -30,15 +30,17 @@ const initializeApp = () => {
 
   // General middlewares
   app.use(express.json()); // Used to parse JSON bodies
-  app.use(cors({
-   origin: [
-    "http://localhost:5173", // for local dev
-    "https://care-connect-frontend.vercel.app", // main production domain
-    "https://care-connect-frontend-git-master-susan-kananas-projects.vercel.app" // Vercel preview link
-  ],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
-  }));
-  app.use("/images", express.static("images"));
+  app.use(
+    cors({
+      origin: [
+        'http://localhost:5173', // for local dev
+        'https://care-connect-frontend.vercel.app', // main production domain
+        'https://care-connect-frontend-git-master-susan-kananas-projects.vercel.app', // Vercel preview link
+      ],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    })
+  );
+  app.use('/images', express.static('images'));
 
   // Routes
   user(app);
@@ -48,8 +50,8 @@ const initializeApp = () => {
   complaint(app);
   payment(app);
   service(app);
-  
-  aiAssistant(app); //aiAssistant function is a route configurator that takes your Express app instance (app) as an argument and then sets up a new route on it. 
+
+  aiAssistant(app); //aiAssistant function is a route configurator that takes your Express app instance (app) as an argument and then sets up a new route on it.
 
   app.get('/', (_req, res) => {
     res.send('Hello, World!');
@@ -60,4 +62,3 @@ const initializeApp = () => {
 
 const app = initializeApp();
 export default app;
-
