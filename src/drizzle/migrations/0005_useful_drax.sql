@@ -1,0 +1,1 @@
+ALTER TABLE "appointments" ADD COLUMN "video_url" varchar(255) DEFAULT '';

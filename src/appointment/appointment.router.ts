@@ -10,6 +10,8 @@ import {
   deleteAppointmentController,
   getDetailedAppointmentsController,
   updateAppointmentStatusController,
+  createVideoRoomController,
+  generateVideoTokenController,
 } from './appointment.controller';
 
 import {
@@ -105,6 +107,18 @@ const appointment = (app: Express) => {
   app.route('/appointment/:id').delete(adminRoleAuth, async (req, res, next) => {
     try {
       await deleteAppointmentController(req, res);
+    } catch (error: any) {
+      next(error);
+    }
+  });
+
+  // -----------------------------
+  // Video call routes (appointment module)
+  // -----------------------------
+  // Generate short-lived token to join video room (user only)
+  app.route('/appointment/video/token/:appointmentId').get(bothRoleAuth, async (req, res, next) => {
+    try {
+      await generateVideoTokenController(req, res);
     } catch (error: any) {
       next(error);
     }

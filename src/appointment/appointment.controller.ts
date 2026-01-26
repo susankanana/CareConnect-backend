@@ -10,6 +10,8 @@ import {
   updateAppointmentService,
   updateAppointmentStatusService,
   deleteAppointmentService,
+  createVideoRoomService,
+  generateVideoTokenService,
 } from './appointment.service';
 
 // Create appointment
@@ -172,3 +174,30 @@ export const deleteAppointmentController = async (req: Request, res: Response) =
     return res.status(500).json({ error: error.message });
   }
 };
+
+//-----------------------------------------------------
+//DAILY INTEGRATION
+//-----------------------------------------------------
+// Create Daily room after payment
+export const createVideoRoomController = async (req: Request, res: Response) => {
+  try {
+    const { appointmentId } = req.body;
+    const url = await createVideoRoomService(appointmentId);
+    res.status(200).json({ url });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Generate token for frontend join
+export const generateVideoTokenController = async (req: Request, res: Response) => {
+  try {
+    const appointmentId = parseInt(req.params.appointmentId);
+    const user = req.user; // from bearerAuth middleware
+    const data = await generateVideoTokenService(appointmentId, user);
+    res.status(200).json(data);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+

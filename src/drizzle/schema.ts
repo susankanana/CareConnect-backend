@@ -93,6 +93,7 @@ export const AppointmentsTable = pgTable('appointments', {
   timeSlot: time('time_slot').notNull(),
   totalAmount: numeric('total_amount', { precision: 10, scale: 2 }),
   appointmentStatus: AppointmentStatusEnum('appointment_status').default('Pending'),
+  videoUrl: varchar('video_url', { length: 255 }).default(''),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

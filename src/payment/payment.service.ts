@@ -2,6 +2,7 @@ import { eq, and } from 'drizzle-orm';
 import Stripe from 'stripe';
 import db from '../drizzle/db';
 import { PaymentsTable, TIPayment, AppointmentsTable } from '../drizzle/schema';
+import { createVideoRoomService } from '../appointment/appointment.service';
 import 'dotenv/config';
 import axios from 'axios'; //used with mpesa
 
@@ -148,38 +149,56 @@ export const getPaymentsByAppointmentService = async (appointmentId: number) => 
   });
 };
 
+//UPSERT - Insert payment if it doesn't exist yet + video room creation automatically.
 export const updatePaymentStatusService = async ({
   appointmentId,
   transactionId,
   amount,
   paymentStatus,
   paymentDate,
+  paymentMethod,
 }: {
   appointmentId: number;
   transactionId?: string;
   amount?: string;
   paymentStatus: 'Paid' | 'Failed';
   paymentDate: Date;
+  paymentMethod?: 'Stripe' | 'M-Pesa';
 }) => {
-  console.log('Trying to update payment with:', {
-    appointmentId,
-    transactionId,
-    amount,
-    paymentStatus,
-    paymentDate,
+  const existingPayment = await db.query.PaymentsTable.findFirst({
+    where: eq(PaymentsTable.appointmentId, appointmentId),
   });
-  console.log('Updating payment for appointmentId:', appointmentId);
-  const result = await db
-    .update(PaymentsTable)
-    .set({
-      transactionId,
-      amount,
+
+  if (!existingPayment) {
+    console.log('Payment record not found, creating new one');
+    await db.insert(PaymentsTable).values({
+      appointmentId,
+      transactionId: transactionId || '',
+      amount: amount || '0',
       paymentStatus,
       paymentDate,
-    })
-    .where(eq(PaymentsTable.appointmentId, appointmentId));
-  console.log('Update result:', result);
+      paymentMethod: paymentMethod || 'Unknown',
+    });
+  } else {
+    console.log('Updating existing payment record');
+    await db
+      .update(PaymentsTable)
+      .set({
+        transactionId,
+        amount,
+        paymentStatus,
+        paymentDate,
+      })
+      .where(eq(PaymentsTable.appointmentId, appointmentId));
+  }
+
+  // Trigger video room if payment is marked as Paid
+  if (paymentStatus === 'Paid') {
+    console.log('Payment marked as PAID → creating Daily video room');
+    await createVideoRoomService(appointmentId);
+  }
 };
+
 
 export const checkPaymentStatusByAppointmentIdService = async (
   appointmentId: number

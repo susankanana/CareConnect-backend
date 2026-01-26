@@ -1,7 +1,15 @@
 import { and, eq } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
+import axios from 'axios';
 import db from '../drizzle/db';
-import { AppointmentsTable, TIAppointment, UsersTable, DoctorsTable } from '../drizzle/schema';
+import 'dotenv/config';
+import {
+  AppointmentsTable,
+  TIAppointment,
+  UsersTable,
+  DoctorsTable,
+  PaymentsTable,
+} from '../drizzle/schema';
 
 // Helper to get day name from date (e.g. "Monday")
 function getDayName(dateStr: string): string {
@@ -212,4 +220,84 @@ export const deleteAppointmentService = async (id: number) => {
     .where(eq(AppointmentsTable.appointmentId, id))
     .returning();
   return deleted[0];
+};
+
+// ------------------------------------------------------
+// INTEGRATING DAILY FOR VIDEO CONSULTATIONS
+// ------------------------------------------------------
+
+// Create Daily room
+export const createVideoRoomService = async (appointmentId: number) => {
+  // Fetch the appointment
+  const appointment = await db.query.AppointmentsTable.findFirst({
+    where: eq(AppointmentsTable.appointmentId, appointmentId),
+  });
+
+  if (!appointment) {
+    throw new Error('Appointment not found');
+  }
+
+  // Check if payment has been made
+  const payment = await db.query.PaymentsTable.findFirst({
+    where: eq(PaymentsTable.appointmentId, appointmentId),
+  });
+
+  if (!payment || payment.paymentStatus !== 'Paid') {
+    throw new Error('Payment not completed. Video room cannot be created.');
+  }
+
+  // Call Daily API to create room
+  const roomResponse = await axios.post(
+    'https://api.daily.co/v1/rooms',
+    {
+      name: `appointment-${appointmentId}`,
+      properties: {
+        exp: Math.floor(Date.now() / 1000) + 7200, // 2 hours
+        enable_screenshare: true,
+      },
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.DAILY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  // Save room URL in DB
+  await db
+    .update(AppointmentsTable)
+    .set({ videoUrl: roomResponse.data.url })
+    .where(eq(AppointmentsTable.appointmentId, appointmentId));
+
+  return roomResponse.data.url;
+};
+
+// Generate short-lived Daily token
+export const generateVideoTokenService = async (appointmentId: number, user: any) => {
+  const appointment = await db.query.AppointmentsTable.findFirst({
+    where: eq(AppointmentsTable.appointmentId, appointmentId),
+  });
+
+  if (!appointment) throw new Error('Appointment not found');
+  if (![appointment.doctorId, appointment.userId].includes(user.id))
+    throw new Error('Unauthorized');
+
+  const tokenResponse = await axios.post(
+    'https://api.daily.co/v1/meeting-tokens',
+    {
+      properties: {
+        room_name: `appointment-${appointmentId}`,
+        user_name: `${user.firstName} ${user.lastName}`,
+      },
+    },
+    {
+      headers: { Authorization: `Bearer ${process.env.DAILY_API_KEY}` },
+    }
+  );
+
+  return {
+    token: tokenResponse.data.token,
+    url: appointment.videoUrl,
+  };
 };

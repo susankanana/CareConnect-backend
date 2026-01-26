@@ -19,12 +19,12 @@ interface CallbackRequest extends Request<{ appointmentId: string }> {}
 function convertMpesaDate(mpesaDate: number): Date {
   const dateStr = mpesaDate.toString();
   const year = parseInt(dateStr.substring(0, 4));
-  const month = parseInt(dateStr.substring(4, 6)) - 1;
+  const month = parseInt(dateStr.substring(4, 6), 10) - 1
   const day = parseInt(dateStr.substring(6, 8));
   const hour = parseInt(dateStr.substring(8, 10));
   const minute = parseInt(dateStr.substring(10, 12));
   const second = parseInt(dateStr.substring(12, 14));
-  return new Date(Date.UTC(year, month, day, hour, minute, second));
+  return new Date(year, month, day, hour, minute, second);
 }
 
 // Trigger M-Pesa STK Push
@@ -170,17 +170,17 @@ export const stripeWebhookController = async (req: Request, res: Response) => {
         });
       }
 
-      // Save the payment
-      await createPaymentRecordService({
+      // UPSERT payment & trigger video room automatically
+      await updatePaymentStatusService({
         appointmentId,
-        amount: amountPaid.toFixed(2),
-        paymentMethod: 'Stripe',
-        paymentStatus: 'Paid',
         transactionId,
+        amount: amountPaid.toFixed(2),
+        paymentStatus: 'Paid',
         paymentDate: new Date(),
+        paymentMethod: 'Stripe',
       });
 
-      console.log('Payment saved to DB for appointment:', appointmentId);
+      console.log('Payment status updated and video room created if needed');
     }
 
     return res.status(200).json({ received: true });
