@@ -92,6 +92,7 @@ export const getAppointmentsByUserIdService = async (userId: number) => {
       timeSlot: AppointmentsTable.timeSlot,
       status: AppointmentsTable.appointmentStatus,
       totalAmount: AppointmentsTable.totalAmount,
+      videoUrl: AppointmentsTable.videoUrl,
       patient: {
         id: UsersTable.userId,
         name: UsersTable.firstName,
@@ -126,6 +127,7 @@ export const getAppointmentsByDoctorIdService = async (doctorId: number) => {
       timeSlot: AppointmentsTable.timeSlot,
       status: AppointmentsTable.appointmentStatus,
       totalAmount: AppointmentsTable.totalAmount,
+      videoUrl: AppointmentsTable.videoUrl,
       patient: {
         id: UsersTable.userId,
         name: UsersTable.firstName,
@@ -167,6 +169,7 @@ export const getDetailedAppointmentsService = async () => {
       timeSlot: AppointmentsTable.timeSlot,
       status: AppointmentsTable.appointmentStatus,
       totalAmount: AppointmentsTable.totalAmount,
+      videoUrl: AppointmentsTable.videoUrl,
       patient: {
         id: UsersTable.userId,
         name: UsersTable.firstName,
