@@ -195,7 +195,7 @@ export const getUsersController = async (req: Request, res: Response) => {
 // get user by id controller
 export const getUserByIdController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) {
       return res.status(400).json({ message: 'Invalid ID' });
     }
@@ -213,7 +213,7 @@ export const getUserByIdController = async (req: Request, res: Response) => {
 // update user by id controller
 export const updateUserController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) {
       return res.status(400).json({ message: 'Invalid ID' });
     }
@@ -245,7 +245,7 @@ export const updateUserController = async (req: Request, res: Response) => {
 // delete user by id controller
 export const deleteUserController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) {
       return res.status(400).json({ message: 'Invalid ID' });
     }

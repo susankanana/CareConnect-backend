@@ -39,7 +39,7 @@ export const getPrescriptionsController = async (_req: Request, res: Response) =
 // Get prescription by ID controller
 export const getPrescriptionByIdController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const prescription = await getPrescriptionByIdService(id);
@@ -54,7 +54,7 @@ export const getPrescriptionByIdController = async (req: Request, res: Response)
 // Get prescriptions by Patient ID controller
 export const getPrescriptionsByPatientIdController = async (req: Request, res: Response) => {
   try {
-    const patientId = parseInt(req.params.patientId);
+    const patientId = parseInt(req.params.patientId as string);
     if (isNaN(patientId)) return res.status(400).json({ message: 'Invalid patient ID' });
 
     const prescriptions = await getPrescriptionsByPatientIdService(patientId);
@@ -67,7 +67,7 @@ export const getPrescriptionsByPatientIdController = async (req: Request, res: R
 // Get prescriptions by Doctor ID controller
 export const getPrescriptionsByDoctorIdController = async (req: Request, res: Response) => {
   try {
-    const doctorId = parseInt(req.params.doctorId);
+    const doctorId = parseInt(req.params.doctorId as string);
     if (isNaN(doctorId)) return res.status(400).json({ message: 'Invalid doctor ID' });
 
     const prescriptions = await getPrescriptionsByDoctorIdService(doctorId);
@@ -80,7 +80,7 @@ export const getPrescriptionsByDoctorIdController = async (req: Request, res: Re
 // Update prescription controller
 export const updatePrescriptionController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const existing = await getPrescriptionByIdService(id);
@@ -96,7 +96,7 @@ export const updatePrescriptionController = async (req: Request, res: Response) 
 // Delete prescription controller
 export const deletePrescriptionController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const existing = await getPrescriptionByIdService(id);

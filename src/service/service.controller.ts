@@ -32,7 +32,7 @@ export const getAllServicesController = async (_req: Request, res: Response) => 
 // Get a single service by ID
 export const getServiceByIdController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid service ID' });
 
     const service = await getServiceByIdService(id);
@@ -52,7 +52,7 @@ export const getServiceByTitleController = async (req: Request, res: Response) =
     return res.status(400).json({ message: 'Title is required.' });
   }
 
-  const service = await getServiceByTitleService(title);
+  const service = await getServiceByTitleService(title as string);
 
   if (!service) {
     return res.status(404).json({ message: 'Service not found.' });
@@ -64,7 +64,7 @@ export const getServiceByTitleController = async (req: Request, res: Response) =
 // Update service
 export const updateServiceController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid service ID' });
 
     const updated = await updateServiceService(id, req.body);
@@ -77,7 +77,7 @@ export const updateServiceController = async (req: Request, res: Response) => {
 // Delete service
 export const deleteServiceController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid service ID' });
 
     const deleted = await deleteServiceService(id);

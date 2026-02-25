@@ -41,7 +41,7 @@ export const getAppointmentsController = async (req: Request, res: Response) => 
 // Get appointment by ID
 export const getAppointmentByIdController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const appointment = await getAppointmentByIdService(id);
@@ -55,7 +55,7 @@ export const getAppointmentByIdController = async (req: Request, res: Response) 
 // Get appointments by user (patient) ID
 export const getAppointmentsByUserIdController = async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = parseInt(req.params.userId as string);
     if (isNaN(userId)) return res.status(400).json({ message: 'Invalid User ID' });
 
     const appointments = await getAppointmentsByUserIdService(userId);
@@ -68,7 +68,7 @@ export const getAppointmentsByUserIdController = async (req: Request, res: Respo
 // Get appointments by doctor ID
 export const getAppointmentsByDoctorIdController = async (req: Request, res: Response) => {
   try {
-    const doctorId = parseInt(req.params.doctorId);
+    const doctorId = parseInt(req.params.doctorId as string);
     if (isNaN(doctorId)) return res.status(400).json({ message: 'Invalid Doctor ID' });
 
     const appointments = await getAppointmentsByDoctorIdService(doctorId);
@@ -82,7 +82,7 @@ export const getAppointmentsByDoctorIdController = async (req: Request, res: Res
 export const getAppointmentsByStatusController = async (req: Request, res: Response) => {
   try {
     const { status } = req.params;
-    const appointments = await getAppointmentsByStatusService(status);
+    const appointments = await getAppointmentsByStatusService(status as string);
     return res.status(200).json({ data: appointments });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -102,7 +102,7 @@ export const getDetailedAppointmentsController = async (req: Request, res: Respo
 // Update appointment
 export const updateAppointmentController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const appointment = req.body;
@@ -116,7 +116,7 @@ export const updateAppointmentController = async (req: Request, res: Response) =
 // Update appointment status
 export const updateAppointmentStatusController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     const { status } = req.body;
 
     if (!['Pending', 'Confirmed', 'Cancelled'].includes(status)) {
@@ -163,7 +163,7 @@ export const updateAppointmentStatusController = async (req: Request, res: Respo
 // Delete appointment
 export const deleteAppointmentController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const deleted = await deleteAppointmentService(id);
@@ -192,7 +192,7 @@ export const createVideoRoomController = async (req: Request, res: Response) => 
 // Generate token for frontend join
 export const generateVideoTokenController = async (req: Request, res: Response) => {
   try {
-    const appointmentId = parseInt(req.params.appointmentId);
+    const appointmentId = parseInt(req.params.appointmentId as string);
     const user = req.user; // from bearerAuth middleware
     const data = await generateVideoTokenService(appointmentId, user);
     res.status(200).json(data);

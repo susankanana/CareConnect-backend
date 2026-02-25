@@ -44,7 +44,7 @@ export const getComplaintsController = async (_req: Request, res: Response) => {
 // Get complaint by ID
 export const getComplaintByIdController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const complaint = await getComplaintByIdService(id);
@@ -59,7 +59,7 @@ export const getComplaintByIdController = async (req: Request, res: Response) =>
 // Get complaints by user ID
 export const getComplaintsByUserIdController = async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = parseInt(req.params.userId as string);
     if (isNaN(userId)) return res.status(400).json({ message: 'Invalid user ID' });
 
     const complaints = await getComplaintsByUserIdService(userId);
@@ -73,7 +73,7 @@ export const getComplaintsByUserIdController = async (req: Request, res: Respons
 export const getComplaintsByStatusController = async (req: Request, res: Response) => {
   try {
     const { status } = req.params;
-    const complaints = await getComplaintsByStatusService(status);
+    const complaints = await getComplaintsByStatusService(status as string);
 
     return res.status(200).json({ data: complaints });
   } catch (error: any) {
@@ -84,7 +84,7 @@ export const getComplaintsByStatusController = async (req: Request, res: Respons
 // Update complaint by ID
 export const updateComplaintController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const existing = await getComplaintByIdService(id);
@@ -102,7 +102,7 @@ const validComplaintStatuses = ['Open', 'In Progress', 'Resolved', 'Closed'];
 
 export const updateComplaintStatusController = async (req: Request, res: Response) => {
   try {
-    const complaintId = parseInt(req.params.id);
+    const complaintId = parseInt(req.params.id as string);
     const { status } = req.body;
 
     // Validate status
@@ -141,7 +141,7 @@ export const updateComplaintStatusController = async (req: Request, res: Respons
 // Delete complaint by ID
 export const deleteComplaintController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: 'Invalid ID' });
 
     const existing = await getComplaintByIdService(id);

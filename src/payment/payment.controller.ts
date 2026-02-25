@@ -226,7 +226,7 @@ export const getAllPaymentsController = async (_req: Request, res: Response) => 
 // Get Payment by ID
 export const getPaymentByIdController = async (req: Request, res: Response) => {
   try {
-    const paymentId = parseInt(req.params.id);
+    const paymentId = parseInt(req.params.id as string);
     if (isNaN(paymentId)) {
       return res.status(400).json({ message: 'Invalid payment ID' });
     }
@@ -245,7 +245,7 @@ export const getPaymentByIdController = async (req: Request, res: Response) => {
 // Get Payments by Appointment ID
 export const getPaymentsByAppointmentController = async (req: Request, res: Response) => {
   try {
-    const appointmentId = parseInt(req.params.appointmentId);
+    const appointmentId = parseInt(req.params.appointmentId as string);
     if (isNaN(appointmentId)) {
       return res.status(400).json({ message: 'Invalid appointment ID' });
     }
@@ -260,7 +260,7 @@ export const getPaymentsByAppointmentController = async (req: Request, res: Resp
 // Check Payment Status by Appointment ID
 export const checkPaymentStatusByAppointmentIdController = async (req: Request, res: Response) => {
   try {
-    const appointmentId = parseInt(req.params.appointmentId);
+    const appointmentId = parseInt(req.params.appointmentId as string);
     if (isNaN(appointmentId)) {
       return res.status(400).json({ message: 'Invalid appointment ID' });
     }

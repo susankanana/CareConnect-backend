@@ -1,4 +1,7 @@
-import './instrument'; // MUST be the first import
+// MUST be the first import. Why js even though the file is ts? 
+// Since you are using "module": "NodeNext", TypeScript requires you to import 
+// using the extension that will exist in the final build. i.e instrument.js
+import './instrument.js'; 
 import './types/global.types';
 import express from 'express';
 import cors from 'cors';

@@ -8,7 +8,7 @@ import {
 // get doctor by id
 export const getDoctorByIdController = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) {
       return res.status(400).json({ message: 'Invalid ID' });
     }
@@ -40,7 +40,7 @@ export const getDoctorsController = async (req: Request, res: Response) => {
 //get doctor by specialization
 export const getDoctorBySpecializationController = async (req: Request, res: Response) => {
   try {
-    const specialization = req.params.specialization?.trim();
+    const specialization = (req.params.specialization as string)?.trim();
 
     if (!specialization || specialization.trim() === '') {
       return res.status(400).json({ message: 'Specialization is required' });
