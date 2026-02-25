@@ -1,6 +1,8 @@
+import './instrument'; // MUST be the first import
 import './types/global.types';
 import express from 'express';
 import cors from 'cors';
+import * as Sentry from '@sentry/node';
 
 import user from './auth/auth.router';
 import doctor from './doctor/doctor.router';
@@ -55,6 +57,28 @@ const initializeApp = () => {
 
   app.get('/', (_req, res) => {
     res.send('Hello, World!');
+  });
+
+  // --- SENTRY VERIFICATION ROUTE ---
+  app.get('/debug-sentry', (req, res) => {
+    throw new Error('My first Sentry error!');
+  });
+
+  // --- SENTRY ERROR HANDLING (MUST be after routes) ---
+  // Sentry needs to be registered here to catch errors from the routes above
+  Sentry.setupExpressErrorHandler(app);
+
+  // Custom fallthrough error handler
+  app.use((err: any, req: any, res: any, next: any) => {
+    // Log the error ID to the console local debugging
+    console.error(`[Sentry Error ID]: ${res.sentry}`);
+
+    res.status(500).json({
+      success: false,
+      message: 'Oops! Something went wrong on our end.',
+      instruction: 'Please try again in a few moments or contact support if the issue persists.',
+      errorId: res.sentry, // Giving the user a reference ID makes them feel "heard"
+    });
   });
 
   return app;

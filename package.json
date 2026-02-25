@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc && pnpm sentry:sourcemaps",
     "start": "node dist/server.js",
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/drizzle/migrate.ts",
@@ -29,7 +29,8 @@
     "soak:createappointment": "k6 run load-tests/soak/appointment.post.soak.ts",
     "breakpoint:register": "k6 run load-tests/breakpoint/register.breakpoint.ts",
     "breakpoint:getdoctors": "k6 run load-tests/breakpoint/doctors.get.breakpoint.ts",
-    "breakpoint:createappointment": "k6 run load-tests/breakpoint/appointment.post.breakpoint.ts"
+    "breakpoint:createappointment": "k6 run load-tests/breakpoint/appointment.post.breakpoint.ts",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org my-qa-lens --project node-express ./dist && sentry-cli sourcemaps upload --org my-qa-lens --project node-express ./dist"
   },
   "keywords": [],
   "author": "Susan",
@@ -53,6 +54,8 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@neondatabase/serverless": "^1.0.1",
+    "@sentry/cli": "^2.58.5",
+    "@sentry/node": "^10.40.0",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
