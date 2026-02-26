@@ -30,7 +30,7 @@
     "breakpoint:register": "k6 run load-tests/breakpoint/register.breakpoint.ts",
     "breakpoint:getdoctors": "k6 run load-tests/breakpoint/doctors.get.breakpoint.ts",
     "breakpoint:createappointment": "k6 run load-tests/breakpoint/appointment.post.breakpoint.ts",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org my-qa-lens --project node-express ./dist && sentry-cli sourcemaps upload --org my-qa-lens --project node-express ./dist"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject ./dist && sentry-cli sourcemaps upload ./dist"
   },
   "keywords": [],
   "author": "Susan",
