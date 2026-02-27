@@ -6,10 +6,9 @@ tracer.init({
   env: 'production',
   version: '1.0.0',
   sampleRate: 1.0,
-  
-  url: process.env.DD_TRACE_OTLP_HTTP_ENDPOINT, 
-  // @ts-ignore - explicitly disabling CI mode to stop the 404 path
-  ciVisibility: false,
+  // This forces the tracer to send traces (APM) instead of CI payloads
+  // @ts-ignore
+  url: process.env.DD_TRACE_OTLP_HTTP_ENDPOINT,
   experimental: {
     exporter: 'datadog'
   }
