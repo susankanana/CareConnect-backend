@@ -6,24 +6,25 @@ tracer.init({
   env: 'production',
   version: '1.0.0',
   sampleRate: 1.0,
-  // This forces the tracer to send traces (APM) instead of CI payloads
   // @ts-ignore
-  url: process.env.DD_TRACE_OTLP_HTTP_ENDPOINT,
+  url: 'https://otlp-http.us5.datadoghq.com/v1/traces',
+  // @ts-ignore
+  ciVisibility: false,
   experimental: {
-    exporter: 'datadog'
-  }
+    exporter: 'datadog',
+  },
 });
+
 // tracer.init({
 //   logInjection: true, // This links your logs to your traces!
 //   //analytics: true   // 'analytics' has been removed; throughput is now managed in the Datadog UI
-// }); 
-
+// });
 
 // 2. SENTRY SECOND
-// MUST be the first import. Why js even though the file is ts? 
-// Since you are using "module": "NodeNext", TypeScript requires you to import 
+// MUST be the first import. Why js even though the file is ts?
+// Since you are using "module": "NodeNext", TypeScript requires you to import
 // using the extension that will exist in the final build. i.e instrument.js
-import './instrument.js'; 
+import './instrument.js';
 import './types/global.types';
 import express from 'express';
 import cors from 'cors';
