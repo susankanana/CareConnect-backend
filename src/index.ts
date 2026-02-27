@@ -8,6 +8,8 @@ tracer.init({
   sampleRate: 1.0,
   
   url: process.env.DD_TRACE_OTLP_HTTP_ENDPOINT, 
+  // @ts-ignore - explicitly disabling CI mode to stop the 404 path
+  ciVisibility: false,
   experimental: {
     exporter: 'datadog'
   }
