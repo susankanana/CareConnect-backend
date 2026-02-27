@@ -1,3 +1,12 @@
+// 1. DATADOG FIRST (Must be absolute top for auto-instrumentation)
+import tracer from 'dd-trace';
+tracer.init({
+  logInjection: true, // This links your logs to your traces!
+  //analytics: true   // 'analytics' has been removed; throughput is now managed in the Datadog UI
+}); 
+
+
+// 2. SENTRY SECOND
 // MUST be the first import. Why js even though the file is ts? 
 // Since you are using "module": "NodeNext", TypeScript requires you to import 
 // using the extension that will exist in the final build. i.e instrument.js
