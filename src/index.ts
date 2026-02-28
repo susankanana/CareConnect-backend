@@ -1,6 +1,6 @@
 import 'dotenv/config';  
-console.log("DD_TRACER_OTLP_ENABLED:", process.env.DD_TRACER_OTLP_ENABLED);
-console.log("DD_TRACE_OTLP_HTTP_ENDPOINT:", process.env.DD_TRACE_OTLP_HTTP_ENDPOINT);
+console.log("DD_TRACE_AGENTLESS:", process.env.DD_TRACE_AGENTLESS);
+console.log("DD_TRACE_AGENT_URL:", process.env.DD_TRACE_AGENT_URL);
 console.log("DD_API_KEY:", process.env.DD_API_KEY ? "SET" : "MISSING");
 
 // 1. DATADOG FIRST (Must be absolute top for auto-instrumentation)
