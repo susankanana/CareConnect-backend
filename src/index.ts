@@ -3,6 +3,10 @@ import 'dotenv/config';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
+
+// This tells the OTel internal system to print everything it does to the console.
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const api_key: string = process.env.DD_API_KEY || '';
 
