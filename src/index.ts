@@ -5,14 +5,12 @@ tracer.init({
   service: 'careconnect-backend',
   env: 'production',
   version: '1.0.0',
-  sampleRate: 1.0,
+  // @ts-ignore
+  site: 'us5.datadoghq.com',
   // @ts-ignore
   url: 'https://otlp-http.us5.datadoghq.com/v1/traces',
   // @ts-ignore
-  ciVisibility: false,
-  experimental: {
-    exporter: 'datadog',
-  },
+  ciVisibility: false
 });
 
 // tracer.init({
