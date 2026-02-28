@@ -3,8 +3,10 @@ import 'dotenv/config';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-const resourceModule = require('@opentelemetry/resources');
-const Resource = resourceModule.Resource || resourceModule.default?.Resource || resourceModule;
+import type { Resource } from '@opentelemetry/resources';
+// the hand‑shaken types only expose `Resource` as a type; pull the real constructor
+// at runtime with require so we can call `new` on it.
+const { Resource: ResourceCtor } = require('@opentelemetry/resources');
 
 // Use the new package for attributes to avoid deprecation warnings
 import {
@@ -15,7 +17,7 @@ import {
 const api_key: string = process.env.DD_API_KEY || '';
 
 const sdk = new NodeSDK({
-  resource: new Resource({
+  resource: new ResourceCtor({
     [ATTR_SERVICE_NAME]: process.env.DD_SERVICE || 'careconnect-backend',
     [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: process.env.DD_ENV || 'production',
   }),
