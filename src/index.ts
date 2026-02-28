@@ -1,43 +1,5 @@
 import 'dotenv/config';
-// 1. DATADOG FIRST (Must be absolute top for auto-instrumentation)
-import { NodeSDK } from '@opentelemetry/sdk-node';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
-
-// This tells the OTel internal system to print everything it does to the console.
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
-
-const api_key: string = process.env.DD_API_KEY || '';
-
-console.log('DEBUG: API Key exists:', !!process.env.DD_API_KEY);
-console.log('DEBUG: Trace URL:', process.env.DD_TRACE_AGENT_URL);
-const sdk = new NodeSDK({
-  traceExporter: new OTLPTraceExporter({
-    url: process.env.DD_TRACE_AGENT_URL || 'https://otlp-http.us5.datadoghq.com/v1/traces',
-    headers: {
-      'DD-API-KEY': api_key,
-    },
-  }),
-  instrumentations: [getNodeAutoInstrumentations()],
-});
-
-try {
-  sdk.start();
-  console.log('OpenTelemetry SDK started successfully');
-} catch (error) {
-  console.error('Error starting OpenTelemetry SDK', error);
-}
-process.on('SIGTERM', async () => {
-  await sdk.shutdown();
-  console.log('OpenTelemetry SDK shut down gracefully');
-  process.exit(0);
-});
-
-// 2. SENTRY SECOND
-// MUST be the first import. Why js even though the file is ts?
-// Since you are using "module": "NodeNext", TypeScript requires you to import
-// using the extension that will exist in the final build. i.e instrument.js
+//This handles everything (Sentry + Datadog)
 import './instrument.js';
 import './types/global.types';
 import express from 'express';
