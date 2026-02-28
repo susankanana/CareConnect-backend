@@ -4,21 +4,9 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
-import * as OTelResources from '@opentelemetry/resources';
-
-import {
-  ATTR_SERVICE_NAME,
-  SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
-} from '@opentelemetry/semantic-conventions';
-
 const api_key: string = process.env.DD_API_KEY || '';
 
 const sdk = new NodeSDK({
-  // This method is much safer on Node 22 than 'new Resource()'
-  resource: new (OTelResources.Resource as any)({
-    [ATTR_SERVICE_NAME]: process.env.DD_SERVICE || 'careconnect-backend',
-    [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: process.env.DD_ENV || 'production',
-  }),
   traceExporter: new OTLPTraceExporter({
     url: process.env.DD_TRACE_AGENT_URL || 'https://otlp-http.us5.datadoghq.com/v1/traces',
     headers: {
