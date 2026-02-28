@@ -29,7 +29,7 @@ Sentry.init({
   openTelemetrySpanProcessors: [
     new SimpleSpanProcessor(
       new OTLPTraceExporter({
-        url: 'https://api.us5.datadoghq.com/api/v2/otlp/v1/traces',
+        url: 'https://api.us5.datadoghq.com/api/v2/otlp',
         headers: {
           'DD-API-KEY': process.env.DD_API_KEY || '',
           // This header is the 'Missing Step' for many agentless setups
