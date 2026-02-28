@@ -31,9 +31,8 @@ Sentry.init({
   openTelemetrySpanProcessors: [
     new SimpleSpanProcessor(
       new OTLPTraceExporter({
-        // 2. THE FIX FOR DATADOG 404
-        // Adding the full path AND ensuring we use the US5 endpoint
-        url: 'https://otlp-http.us5.datadoghq.com/v1/traces',
+        
+        url: 'https://trace.browser-intake-us5-datadoghq.com/api/v2/spans',
         headers: {
           'DD-API-KEY': process.env.DD_API_KEY || '',
           'Content-Type': 'application/json',
