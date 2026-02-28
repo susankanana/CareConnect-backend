@@ -1,22 +1,15 @@
+import 'dotenv/config';  
+console.log("DD_TRACER_OTLP_ENABLED:", process.env.DD_TRACER_OTLP_ENABLED);
+console.log("DD_TRACE_OTLP_HTTP_ENDPOINT:", process.env.DD_TRACE_OTLP_HTTP_ENDPOINT);
+console.log("DD_API_KEY:", process.env.DD_API_KEY ? "SET" : "MISSING");
+
 // 1. DATADOG FIRST (Must be absolute top for auto-instrumentation)
 import tracer from 'dd-trace';
 
 tracer.init({
-  service: 'careconnect-backend',
-  env: 'production',
-  version: '1.0.0',
-  // @ts-ignore
-  site: 'us5.datadoghq.com',
-  // @ts-ignore
-  url: 'https://otlp-http.us5.datadoghq.com/v1/traces',
-  // @ts-ignore
-  ciVisibility: false
+  logInjection: true, // This links your logs to your traces!
+  //analytics: true   // 'analytics' has been removed; throughput is now managed in the Datadog UI
 });
-
-// tracer.init({
-//   logInjection: true, // This links your logs to your traces!
-//   //analytics: true   // 'analytics' has been removed; throughput is now managed in the Datadog UI
-// });
 
 // 2. SENTRY SECOND
 // MUST be the first import. Why js even though the file is ts?
