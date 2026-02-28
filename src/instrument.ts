@@ -10,22 +10,26 @@
 // });
 
 import 'dotenv/config';
-import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 import * as Sentry from "@sentry/node";
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
-  sendDefaultPii: true,
   tracesSampleRate: 1.0,
   
-  // This is the official "bridge" for Sentry 10+
+  // 1. THIS IS THE FIX FOR OLD SENTRY INSIGHTS
+  // Without this, Sentry 10 ignores all your Express routes.
+  integrations: [
+    Sentry.expressIntegration(),
+  ],
+
   openTelemetrySpanProcessors: [
     new SimpleSpanProcessor(
       new OTLPTraceExporter({
-        url: 'https://otlp-http.us5.datadoghq.com',
+        // 2. THE FIX FOR DATADOG 404
+        // Adding the full path AND ensuring we use the US5 endpoint
+        url: 'https://otlp-http.us5.datadoghq.com/v1/traces',
         headers: {
           'DD-API-KEY': process.env.DD_API_KEY || '',
         },
