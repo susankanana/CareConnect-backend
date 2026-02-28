@@ -1,14 +1,42 @@
-import 'dotenv/config';  
-console.log("DD_TRACE_AGENTLESS:", process.env.DD_TRACE_AGENTLESS);
-console.log("DD_TRACE_AGENT_URL:", process.env.DD_TRACE_AGENT_URL);
-console.log("DD_API_KEY:", process.env.DD_API_KEY ? "SET" : "MISSING");
-
+import 'dotenv/config';
 // 1. DATADOG FIRST (Must be absolute top for auto-instrumentation)
-import tracer from 'dd-trace';
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+const { Resource } = require('@opentelemetry/resources');
 
-tracer.init({
-  logInjection: true, // This links your logs to your traces!
-  //analytics: true   // 'analytics' has been removed; throughput is now managed in the Datadog UI
+// Use the new package for attributes to avoid deprecation warnings
+import {
+  ATTR_SERVICE_NAME,
+  SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
+} from '@opentelemetry/semantic-conventions';
+
+const api_key: string = process.env.DD_API_KEY || '';
+
+const sdk = new NodeSDK({
+  resource: new Resource({
+    [ATTR_SERVICE_NAME]: process.env.DD_SERVICE || 'careconnect-backend',
+    [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: process.env.DD_ENV || 'production',
+  }),
+  traceExporter: new OTLPTraceExporter({
+    url: process.env.DD_TRACE_AGENT_URL,
+    headers: {
+      'dd-api-key': api_key,
+    },
+  }),
+  instrumentations: [getNodeAutoInstrumentations()],
+});
+
+try {
+  sdk.start();
+  console.log('OpenTelemetry SDK started successfully');
+} catch (error) {
+  console.error('Error starting OpenTelemetry SDK', error);
+}
+process.on('SIGTERM', async () => {
+  await sdk.shutdown();
+  console.log('OpenTelemetry SDK shut down gracefully');
+  process.exit(0);
 });
 
 // 2. SENTRY SECOND
