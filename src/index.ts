@@ -3,12 +3,9 @@ import 'dotenv/config';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import type { Resource } from '@opentelemetry/resources';
-// the hand‑shaken types only expose `Resource` as a type; pull the real constructor
-// at runtime with require so we can call `new` on it.
-const { Resource: ResourceCtor } = require('@opentelemetry/resources');
 
-// Use the new package for attributes to avoid deprecation warnings
+import * as OTelResources from '@opentelemetry/resources';
+
 import {
   ATTR_SERVICE_NAME,
   SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
@@ -17,12 +14,13 @@ import {
 const api_key: string = process.env.DD_API_KEY || '';
 
 const sdk = new NodeSDK({
-  resource: new ResourceCtor({
+  // This method is much safer on Node 22 than 'new Resource()'
+  resource: new (OTelResources.Resource as any)({
     [ATTR_SERVICE_NAME]: process.env.DD_SERVICE || 'careconnect-backend',
     [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: process.env.DD_ENV || 'production',
   }),
   traceExporter: new OTLPTraceExporter({
-    url: process.env.DD_TRACE_AGENT_URL,
+    url: process.env.DD_TRACE_AGENT_URL || 'https://otlp-http.us5.datadoghq.com/v1/traces',
     headers: {
       'dd-api-key': api_key,
     },
