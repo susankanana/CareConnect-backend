@@ -3,7 +3,8 @@ import 'dotenv/config';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-const { Resource } = require('@opentelemetry/resources');
+const resourceModule = require('@opentelemetry/resources');
+const Resource = resourceModule.Resource || resourceModule.default?.Resource || resourceModule;
 
 // Use the new package for attributes to avoid deprecation warnings
 import {
