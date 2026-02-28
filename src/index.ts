@@ -10,7 +10,7 @@ const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter({
     url: process.env.DD_TRACE_AGENT_URL || 'https://otlp-http.us5.datadoghq.com/v1/traces',
     headers: {
-      'dd-api-key': api_key,
+      'DD-API-KEY': api_key,
     },
   }),
   instrumentations: [getNodeAutoInstrumentations()],
