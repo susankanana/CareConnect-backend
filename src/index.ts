@@ -6,6 +6,8 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const api_key: string = process.env.DD_API_KEY || '';
 
+console.log('DEBUG: API Key exists:', !!process.env.DD_API_KEY);
+console.log('DEBUG: Trace URL:', process.env.DD_TRACE_AGENT_URL);
 const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter({
     url: process.env.DD_TRACE_AGENT_URL || 'https://otlp-http.us5.datadoghq.com/v1/traces',
