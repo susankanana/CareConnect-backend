@@ -25,7 +25,7 @@ Sentry.init({
   openTelemetrySpanProcessors: [
     new SimpleSpanProcessor(
       new OTLPTraceExporter({
-        url: 'https://otlp-http.us5.datadoghq.com/v1/traces',
+        url: 'https://otlp-http.us5.datadoghq.com',
         headers: {
           'DD-API-KEY': process.env.DD_API_KEY || '',
         },
