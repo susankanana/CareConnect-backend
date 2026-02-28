@@ -32,8 +32,10 @@ Sentry.init({
         url: 'https://otlp-http.us5.datadoghq.com',
         headers: {
           'DD-API-KEY': process.env.DD_API_KEY || '',
-          // This header is the 'Missing Step' for many agentless setups
           'dd-protocol': 'otlp',
+          // manually injecting what you have in those Render variables:
+          'dd-service': 'careconnect-backend',
+          'dd-env': 'production',
         },
       })
     ),
